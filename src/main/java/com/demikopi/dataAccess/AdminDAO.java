@@ -9,19 +9,17 @@ import java.sql.SQLException;
 public class AdminDAO extends DatabaseConfig {
 
     public Admin getAdmin(String username) {
-        try {
-            String query = "select username, password, nama_lengkap from admin where username = ?";
-            PreparedStatement myStmt = conn.prepareStatement(query);
+        String query = "SELECT username, password, nama_lengkap FROM admin WHERE username = ?";
+        try (PreparedStatement myStmt = conn.prepareStatement(query)) {
             myStmt.setString(1, username);
             ResultSet myRs = myStmt.executeQuery();
-            while (myRs.next()) {
-                String un = myRs.getString("username");
+            if (myRs.next()) {
                 String pass = myRs.getString("password");
                 String namaLengkap = myRs.getString("nama_lengkap");
                 return new Admin(username, pass, namaLengkap);
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("getAdmin error: " + e.getMessage());
         }
         return null;
     }

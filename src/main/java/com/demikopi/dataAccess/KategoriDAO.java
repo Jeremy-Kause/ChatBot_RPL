@@ -17,7 +17,7 @@ public class KategoriDAO extends DatabaseConfig {
             ResultSet myRs = myStmt.executeQuery();
             while (myRs.next()) {
                 int id_kategori = myRs.getInt("id_kategori");
-                String kategori_name = myRs.getString("nama_kategori"); // FIX: nama kolom di DB adalah 'nama_kategori', bukan 'kategori_name'
+                String kategori_name = myRs.getString("nama_kategori");
                 kategoriList.add(new Kategori(id_kategori, kategori_name));
             }
         } catch (SQLException e) {
@@ -36,7 +36,7 @@ public class KategoriDAO extends DatabaseConfig {
         return null;
     }
 
-    public Kategori getKateoriByName(String name) {
+    public Kategori getKategoriByName(String name) {
         List<Kategori> kategoriList = getAllKategori();
         for (Kategori kategori : kategoriList) {
             if (kategori.getNamaKategori().equals(name)) {
@@ -49,10 +49,11 @@ public class KategoriDAO extends DatabaseConfig {
     public int getIdKategoriByName(String name) {
         List<Kategori> kategoriList = getAllKategori();
         for (Kategori kategori : kategoriList) {
-            if  (kategori.getNamaKategori().equals(name)) {
+            if (kategori.getNamaKategori().equals(name)) {
                 return kategori.getIdKategori();
             }
         }
         return -1;
     }
 }
+// Done

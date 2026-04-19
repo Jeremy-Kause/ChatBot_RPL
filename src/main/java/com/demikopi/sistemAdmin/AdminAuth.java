@@ -1,13 +1,10 @@
 package com.demikopi.sistemAdmin;
 
 import com.demikopi.dataAccess.AdminDAO;
-import com.demikopi.dataAccess.DatabaseConfig;
 import com.demikopi.model.Admin;
 
-import java.sql.Connection;
-
 public class AdminAuth {
-    AdminDAO adminDAO = new AdminDAO();
+    private AdminDAO adminDAO = new AdminDAO();
 
     public boolean login(String username, String password) {
         Admin admin = adminDAO.getAdmin(username);
@@ -16,3 +13,4 @@ public class AdminAuth {
         return admin.getPassword().equals(password);
     }
 }
+// Done

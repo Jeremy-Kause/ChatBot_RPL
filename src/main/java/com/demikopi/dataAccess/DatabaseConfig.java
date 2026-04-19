@@ -6,12 +6,11 @@ import java.sql.SQLException;
 
 public abstract class DatabaseConfig {
 
-    protected static Connection conn;
+    protected Connection conn;
 
-    // Static initializer — dijalankan sekali saat class pertama kali dimuat
-    static {
+    {
         try {
-            String url  = "jdbc:mysql://localhost:3306/demikopi";
+            String url = "jdbc:mysql://localhost:3306/demikopi";
             String user = "root";
             String pass = "";
 
@@ -23,3 +22,4 @@ public abstract class DatabaseConfig {
         }
     }
 }
+// Done
