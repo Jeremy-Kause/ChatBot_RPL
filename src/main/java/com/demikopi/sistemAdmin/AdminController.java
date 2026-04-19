@@ -30,20 +30,8 @@ public class AdminController {
     private FasilitasDAO fasilitasDAO = new FasilitasDAO();
     private KategoriDAO kategoriDAO = new KategoriDAO();
 
-
-    // =========================================================
-    //  1. MENU
-    // =========================================================
-
-    /**
-     * Mengambil seluruh daftar menu dari database.
-     * Dipakai AdminUI untuk mengisi tabel/list tampilan menu.
-     *
-     * TODO: Panggil menuDAO.getAllMenu() dan return hasilnya.
-     */
     public List<Menu> getAllMenu() {
-        // TODO: return menuDAO.getAllMenu();
-        return null;
+        return menuDAO.getAllMenu();
     }
 
     /**
@@ -61,9 +49,12 @@ public class AdminController {
      * @return true jika berhasil ditambahkan, false jika validasi gagal atau DB error
      */
     public boolean tambahMenu(Menu menu) {
-        // TODO: validasi menu
-        // TODO: return menuDAO.tambahMenu(menu);
-        return false;
+        if (menu == null) {
+            return false;
+        } if (menu.getNamaMenu() == null || menu.getHarga() > 0 || menu.getKategori() == null || menu.getDeskripsiMenu() == null) {
+            return false;
+        }
+        return menuDAO.tambahMenu(menu);
     }
 
     /**
@@ -83,7 +74,13 @@ public class AdminController {
     public boolean updateMenu(Menu menu) {
         // TODO: validasi menu
         // TODO: return menuDAO.updateMenu(menu);
-        return false;
+        if (menu == null) {
+            return false;
+        }
+        if (menu.getNamaMenu() == null || menu.getDeskripsiMenu() == null || menu.getHarga() > 0 || menu.getKategori() == null) {
+            return false;
+        }
+        return menuDAO.updateMenu(menu);
     }
 
     /**
@@ -100,7 +97,13 @@ public class AdminController {
     public boolean hapusMenu(Menu menu) {
         // TODO: validasi menu
         // TODO: return menuDAO.hapusMenu(menu.getIdMenu());
-        return false;
+        if (menu == null) {
+            return false;
+        }
+        if (menu.getIdMenu() < 0) {
+            return false;
+        }
+        return menuDAO.hapusMenu(menu.getIdMenu());
     }
 
 
@@ -118,7 +121,7 @@ public class AdminController {
      */
     public InfoKedai getInfoKedai() {
         // TODO: return infoDAO.getInfoKedai();
-        return null;
+        return infoDAO.getInfo();
     }
 
     /**
@@ -137,7 +140,13 @@ public class AdminController {
     public boolean updateInfoKedai(InfoKedai infoKedai) {
         // TODO: validasi infoKedai
         // TODO: return infoDAO.updateInfo(infoKedai);
-        return false;
+        if (infoKedai == null) {
+            return false;
+        }
+        if (infoKedai.getJamOperasional() == null || infoKedai.getKontak() == null || infoKedai.getLokasi() == null) {
+            return false;
+        }
+        return infoDAO.updateInfo(infoKedai);
     }
 
 
@@ -153,7 +162,7 @@ public class AdminController {
      */
     public List<Fasilitas> getAllFasilitas() {
         // TODO: return fasilitasDAO.getAllFasilitas();
-        return null;
+        return fasilitasDAO.getAllFasilitas();
     }
 
     /**
@@ -172,7 +181,13 @@ public class AdminController {
     public boolean tambahFasilitas(Fasilitas fasilitas) {
         // TODO: validasi fasilitas
         // TODO: return fasilitasDAO.tambahFasilitas(fasilitas);
-        return false;
+        if (fasilitas == null) {
+            return false;
+        }
+        if (fasilitas.getNamaFasilitas() == null || fasilitas.getDeskripsiFasilitas() == null) {
+            return false;
+        }
+        return fasilitasDAO.tambahFasilitas(fasilitas);
     }
 
     /**

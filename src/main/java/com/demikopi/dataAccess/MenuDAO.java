@@ -27,8 +27,7 @@ public class MenuDAO extends DatabaseConfig {
                 int harga = myRs.getInt("harga");
                 String deskripsi = myRs.getString("deskripsi");
                 boolean tersedia = myRs.getBoolean("status_tersedia");
-                allMenu.add(new Menu(idMenu, kategori, namaMenu, profilRasa, suhuSajian, bestSeller, harga, deskripsi,
-                        tersedia));
+                allMenu.add(new Menu(idMenu, kategori, namaMenu, profilRasa, suhuSajian, bestSeller, harga, deskripsi, tersedia));
             }
         } catch (SQLException e) {
             System.out.println("getAllMenu error: " + e.getMessage());
@@ -75,8 +74,7 @@ public class MenuDAO extends DatabaseConfig {
     }
 
     public boolean tambahMenu(Menu menu) {
-        String query = "INSERT INTO menu (id_kategori, nama_menu, profil_rasa, suhu_sajian, is_bestseller, harga, deskripsi, status_tersedia) "
-                +
+        String query = "INSERT INTO menu (id_kategori, nama_menu, profil_rasa, suhu_sajian, is_bestseller, harga, deskripsi, status_tersedia) " +
                 "VALUES ((SELECT id_kategori FROM kategori WHERE nama_kategori = ?), ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement myStmt = conn.prepareStatement(query)) {
             myStmt.setString(1, menu.getKategori());

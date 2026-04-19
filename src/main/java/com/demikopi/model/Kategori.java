@@ -12,7 +12,6 @@ public class Kategori {
     public int getIdKategori() {
         return idKategori;
     }
-
     public String getNamaKategori() {
         return namaKategori;
     }

@@ -1,103 +1,144 @@
 package com.demikopi.sistemUser;
 
 /**
- * NLPService (Natural Language Processing Service)
- *
- * Kelas ini bertugas memahami dan memproses teks yang diketik oleh pengguna.
- * Ini adalah "otak" awal dari chatbot — mengubah kalimat bebas menjadi
- * sesuatu yang bisa dimengerti oleh program.
- *
- * Karena ini chatbot sederhana (rule-based), NLP di sini bukan AI/ML,
- * melainkan pencocokan kata kunci (keyword matching).
- *
- * Alur kerjanya:
- *   Input user (String)
- *     → preprocess()       : bersihkan & normalisasi teks
- *     → detectIntent()     : tentukan maksud/tujuan user
- *     → extractKeyword()   : ambil kata kunci penting dari input
- *     → hasil dikirim ke ChatEngine untuk diproses lebih lanjut
+ * NLPService memproses input user menjadi intent dan keyword.
+ * Algoritma masih rule-based, yaitu pencocokan kata kunci dari teks yang sudah dibersihkan.
  */
 public class NLPService {
 
-    // Menyimpan input mentah dari user
     private String inputUser;
-
-    // Menyimpan input setelah dibersihkan (lowercase, trim, dll.)
-    // private String processedInput;
+    private String processedInput;
 
     public NLPService(String inputUser) {
         this.inputUser = inputUser;
+        this.processedInput = preprocess();
     }
 
-    // =========================================================
-    // ENUM INTENT — Daftar semua kemungkinan maksud user
-    // =========================================================
-    // Intent adalah "apa yang ingin diketahui/dilakukan user".
-    // Setiap intent akan menghasilkan respons yang berbeda dari chatbot.
-    //
-    // Contoh Intent yang direncanakan:
-    //
-    //   TANYA_MENU         → user bertanya daftar menu (kata kunci: "menu", "daftar", "ada apa")
-    //   TANYA_KATEGORI     → user bertanya menu per kategori (kata kunci: "kopi", "makanan", "minuman")
-    //   TANYA_REKOMENDASI  → user minta saran menu (kata kunci: "rekomen", "saran", "enak", "cocok")
-    //   TANYA_DETAIL_MENU  → user tanya detail satu menu (kata kunci: nama menu spesifik)
-    //   TANYA_JAM_BUKA     → user tanya jam operasional (kata kunci: "jam", "buka", "tutup")
-    //   TANYA_LOKASI       → user tanya alamat kedai (kata kunci: "lokasi", "alamat", "di mana")
-    //   TANYA_FASILITAS    → user tanya fasilitas (kata kunci: "fasilitas", "wifi", "parkir", "mushola")
-    //   SALAM              → user menyapa (kata kunci: "halo", "hi", "hey", "selamat")
-    //   TIDAK_DIKENAL      → input tidak cocok dengan intent manapun (fallback response)
-    //
-    // TODO: Buat enum Intent sebagai inner class atau class terpisah
+    public enum Intent {
+        TANYA_MENU,
+        TANYA_KATEGORI,
+        TANYA_REKOMENDASI,
+        TANYA_DETAIL_MENU,
+        TANYA_JAM_BUKA,
+        TANYA_LOKASI,
+        TANYA_FASILITAS,
+        SALAM,
+        TIDAK_DIKENAL
+    }
 
+    private String preprocess() {
+        if (inputUser == null) {
+            return "";
+        }
+        return inputUser.toLowerCase().trim().replaceAll("[?.!]", "");
+    }
 
-    // =========================================================
-    // METHOD: preprocess()
-    // =========================================================
-    // Membersihkan dan menormalisasi input sebelum diproses.
-    // Yang perlu dilakukan:
-    //   - Ubah ke lowercase: "MENU" → "menu"
-    //   - Hapus spasi berlebih: "  menu   " → "menu"
-    //   - (Opsional) Hapus tanda baca: "menu?" → "menu"
-    //   - (Opsional) Normalisasi typo umum: "rekomenasi" → "rekomendasi"
-    // Return: String yang sudah bersih
-    // private String preprocess() { ... }
+    public Intent detectIntent() {
+        if (processedInput == null || processedInput.isEmpty()) {
+            return Intent.TIDAK_DIKENAL;
+        }
+        if (processedInput.matches(".*\\b(halo|hi|hey|hai|pagi|siang|sore|malam)\\b.*")) {
+            return Intent.SALAM;
+        } else if (processedInput.contains("jam") || processedInput.contains("buka") || processedInput.contains("tutup") || processedInput.contains("operasional")) {
+            return Intent.TANYA_JAM_BUKA;
+        } else if (processedInput.contains("lokasi") || processedInput.contains("alamat") || processedInput.contains("di mana") || processedInput.contains("dimana")) {
+            return Intent.TANYA_LOKASI;
+        } else if (processedInput.contains("fasilitas") || processedInput.contains("wifi") || processedInput.contains("parkir") || processedInput.contains("colokan") || processedInput.contains("mushola")) {
+            return Intent.TANYA_FASILITAS;
+        } else if (processedInput.contains("tentang") || processedInput.contains("detail ") || processedInput.contains("info ") || processedInput.contains("deskripsi")) {
+            return Intent.TANYA_DETAIL_MENU;
+        } else if (processedInput.matches(".*\\b(rekomen|rekomendasi|saran|enak|bestseller|best seller|bagus|favorit)\\b.*") ||
+                processedInput.contains("manis") || processedInput.contains("pahit") || processedInput.contains("asam") ||
+                processedInput.contains("dingin") || processedInput.contains("panas") || processedInput.contains("iced") ||
+                processedInput.matches(".*\\b(pengen|mau|pesen|pesan|cari)\\b.*")) {
+            return Intent.TANYA_REKOMENDASI;
+        } else if (processedInput.contains("kopi") || processedInput.contains("makanan") || processedInput.contains("non-kopi") || processedInput.contains("mix")) {
+            return Intent.TANYA_KATEGORI;
+        } else if (processedInput.contains("menu") || processedInput.contains("daftar") || processedInput.contains("ada apa aja")) {
+            return Intent.TANYA_MENU;
+        }
 
+        return Intent.TIDAK_DIKENAL;
+    }
 
-    // =========================================================
-    // METHOD: detectIntent()
-    // =========================================================
-    // Menentukan maksud/tujuan dari input user berdasarkan kata kunci.
-    // Gunakan if-else atau switch yang mengecek apakah processedInput
-    // mengandung kata kunci tertentu (String.contains()).
-    //
-    // Contoh logika:
-    //   if (input mengandung "rekomen" atau "saran") → return Intent.TANYA_REKOMENDASI
-    //   if (input mengandung "jam" atau "buka")      → return Intent.TANYA_JAM_BUKA
-    //   if (input mengandung "halo" atau "hi")       → return Intent.SALAM
-    //   (tidak cocok semua)                          → return Intent.TIDAK_DIKENAL
-    //
-    // Return: Intent (enum)
-    // public Intent detectIntent() { ... }
+    public String extractKeyword(Intent intent) {
+        if (processedInput == null || processedInput.isEmpty()) {
+            return null;
+        }
 
+        switch (intent) {
+            case TANYA_REKOMENDASI:
+                String extractedKategori = null;
 
-    // =========================================================
-    // METHOD: extractKeyword()
-    // =========================================================
-    // Mengambil kata kunci spesifik dari input untuk penyaringan data.
-    // Digunakan terutama untuk intent TANYA_REKOMENDASI dan TANYA_KATEGORI.
-    //
-    // Contoh penggunaan:
-    //   Input: "aku mau yang manis dan dingin"
-    //   extractKeyword() → "manis" (akan dipakai di menuDAO.getMenuByKriteria("manis"))
-    //
-    //   Input: "ada menu kopi apa aja?"
-    //   extractKeyword() → "Kopi" (akan dipakai di menuDAO.getMenuByKategori("Kopi"))
-    //
-    // Daftar kata kunci rasa yang dikenali: manis, pahit, asam, gurih, creamy, fruity
-    // Daftar kata kunci suhu: dingin, panas, iced, hot
-    // Daftar kata kunci kategori: kopi, non-kopi, makanan, camilan
-    //
-    // Return: String kata kunci, atau null jika tidak ditemukan
-    // public String extractKeyword() { ... }
+                // Konteks kategori rekomendasi.
+                if (processedInput.contains("makanan") || processedInput.contains("cemilan") || processedInput.contains("ngemil") || processedInput.contains("makan")) {
+                    extractedKategori = "makanan";
+                } else if (processedInput.contains("non-kopi") || processedInput.contains("non kopi") || processedInput.contains("selain kopi")) {
+                    extractedKategori = "non-kopi";
+                } else if (processedInput.contains("kopi")) {
+                    extractedKategori = "kopi";
+                } else if (processedInput.contains("minuman") || processedInput.contains("minum")) {
+                    extractedKategori = "minuman";
+                }
 
+                String extractedKriteria = null;
+
+                // Kriteria rasa.
+                String[] rasa = {"manis", "pahit", "asam", "gurih", "creamy", "fruity"};
+                for (String r : rasa) {
+                    if (processedInput.contains(r)) {
+                        extractedKriteria = r;
+                        break;
+                    }
+                }
+
+                // Kriteria suhu.
+                if (extractedKriteria == null) {
+                    String[] suhu = {"panas", "dingin", "iced", "hot"};
+                    for (String s : suhu) {
+                        if (processedInput.contains(s)) {
+                            extractedKriteria = s;
+                            break;
+                        }
+                    }
+                }
+
+                if (extractedKategori == null && extractedKriteria == null) {
+                    return null;
+                }
+                return (extractedKategori != null ? extractedKategori : "") + "|" + (extractedKriteria != null ? extractedKriteria : "");
+
+            case TANYA_KATEGORI:
+                String[] kategori = {"non-kopi", "kopi", "makanan", "mix"};
+                for (String k : kategori) {
+                    if (processedInput.contains(k)) {
+                        return k;
+                    }
+                }
+                break;
+
+            case TANYA_DETAIL_MENU:
+                String entity = processedInput;
+                String[] triggers = {"tentang ", "detail ", "info ", "deskripsi "};
+
+                for (String t : triggers) {
+                    if (entity.contains(t)) {
+                        entity = entity.substring(entity.indexOf(t) + t.length()).trim();
+                        break;
+                    }
+                }
+
+                if (entity.startsWith("menu ")) {
+                    entity = entity.substring(5).trim();
+                }
+
+                // Bersihkan kata tambahan agar tersisa nama menu.
+                entity = entity.replaceAll("(?i)\\b(menu|dong|min|kak|ya|sih|tolong|pliss|please|doang)\\b", "").trim();
+                return entity;
+
+            default:
+                return null;
+        }
+        return null;
+    }
 }

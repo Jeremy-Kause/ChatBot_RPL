@@ -16,15 +16,12 @@ public class InfoKedai {
     public String getIdInfo() {
         return idInfo;
     }
-
     public String getJamOperasional() {
         return jamOperasional;
     }
-
     public String getLokasi() {
         return lokasi;
     }
-
     public String getKontak() {
         return kontak;
     }
