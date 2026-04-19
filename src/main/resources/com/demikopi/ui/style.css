@@ -1,0 +1,37 @@
+.root {
+    -fx-primary: #6F4E37;
+    -fx-background: #FAF7F2;
+    -fx-white: #FFFFFF;
+}
+
+.main-bg {
+    -fx-background-color: -fx-background;
+}
+
+.button-primary {
+    -fx-background-color: -fx-primary;
+    -fx-text-fill: -fx-white;
+    -fx-background-radius: 50;
+}
+.button-outline {
+    -fx-background-color: transparent;
+    -fx-border-color: -fx-primary;
+    -fx-border-radius: 10;
+    -fx-text-fill: -fx-primary;
+}
+.bubble-bot {
+    -fx-background-color: -fx-white;
+    -fx-text-fill: #333333;
+    -fx-border-color: #D3D3D3;
+    -fx-border-radius: 0 15 15 15;
+    -fx-background-radius: 0 15 15 15;
+    -fx-padding: 10 15 10 15;
+}
+
+.text-input {
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: #D3D3D3;
+    -fx-background-color: -fx-white;
+    -fx-padding: 8 15;
+}

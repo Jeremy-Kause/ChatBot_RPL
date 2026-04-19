@@ -3,7 +3,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<StackPane stylesheets="@style.css" styleClass="main-bg" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+<StackPane stylesheets="@../style.css" styleClass="main-bg" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
     <VBox alignment="CENTER" spacing="20" maxWidth="400" maxHeight="500"
           style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 10); -fx-background-radius: 15;">
         <padding>

@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="600.0" prefWidth="900.0" styleClass="main-bg" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane prefHeight="600.0" prefWidth="900.0" styleClass="main-bg" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
 
     <!-- SIDEBAR (Kiri) -->
     <left>
@@ -44,7 +44,7 @@
             </HBox>
 
             <!-- Area Chat (Tengah - Akan melebar/expand) -->
-            <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
+            <ScrollPane fitToHeight="true" fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
                 <VBox spacing="20" style="-fx-padding: 20;">
 
                     <!-- 1. TAMBAHKAN REGION INI di paling atas -->
@@ -52,9 +52,9 @@
                     <Region VBox.vgrow="ALWAYS" />
 
                     <!-- 2. Pesan Bot -->
-                    <HBox spacing="10" alignment="BOTTOM_LEFT">
-                        <Region prefHeight="30" prefWidth="30" minWidth="30" style="-fx-background-color: fx-primary; -fx-background-radius: 50;" />
-                        <Label maxWidth="350" styleClass="bubble-bot" text="Halo Saya DemiKopi Bot. Mau cari yang manis atau yang strong? Atau lihat menu kami?" wrapText="true" />
+                    <HBox alignment="BOTTOM_LEFT" spacing="10">
+                        <Region minWidth="30" prefHeight="58.0" prefWidth="40.0" style="-fx-background-color: fx-primary; -fx-background-radius: 50;" />
+                        <Label maxWidth="350" styleClass="bubble-bot" text="Halo Saya DemiKopi Bot. Mau cari yang manis atau yang strong? Atau lihat menu kami?" textOverrun="CLIP" wrapText="true" />
                     </HBox>
 
                 </VBox>
