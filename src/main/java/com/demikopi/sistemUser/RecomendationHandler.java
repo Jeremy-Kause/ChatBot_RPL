@@ -1,190 +1,124 @@
 package com.demikopi.sistemUser;
 
-// TODO: Tambahkan import berikut saat mulai implementasi:
-// import com.demikopi.dataAccess.MenuDAO;
-// import com.demikopi.model.Menu;
-// import java.util.List;
+import com.demikopi.dataAccess.MenuDAO;
+import com.demikopi.model.Menu;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * RecomendationHandler — Handler Khusus Rekomendasi Menu
- *
- * Kelas ini bertanggung jawab menangani satu intent spesifik:
- * TANYA_REKOMENDASI — yaitu saat user meminta saran menu dari chatbot.
- *
- * Alasan dipisahkan dari ChatEngine:
- *   - Logika rekomendasi cukup kompleks (ada beberapa skenario)
- *   - Memudahkan pengembangan dan testing secara mandiri
- *   - Prinsip Single Responsibility — satu kelas, satu tanggung jawab
- *
- * ============================================================
- * SKENARIO REKOMENDASI YANG HARUS DITANGANI:
- * ============================================================
- *
- *   Skenario 1 — Berdasarkan Profil Rasa
- *     Contoh: "aku mau yang manis" / "ada yang pahit?"
- *     Keyword: manis, pahit, asam, gurih, creamy, fruity
- *     → Panggil menuDAO.getMenuByKriteria(keyword)
- *     → Tampilkan daftar menu yang cocok
- *
- *   Skenario 2 — Berdasarkan Suhu Sajian
- *     Contoh: "aku mau yang dingin" / "ada yang panas?"
- *     Keyword: panas, dingin, iced, hot
- *     → Filter dari menuDAO.getAllMenu() berdasarkan suhuSajian
- *     → Tampilkan daftar menu yang cocok
- *
- *   Skenario 3 — Bestseller / Tanpa Preferensi Spesifik
- *     Contoh: "rekomendasiin dong" / "menu terpopuler apa?"
- *     → Panggil menuDAO.getMBestSeller()  ← PERHATIAN: method ini belum selesai!
- *     → Tampilkan daftar menu bestseller
- *
- * ============================================================
- * ALUR KERJA INTERNAL:
- * ============================================================
- *
- *   ChatEngine memanggil:
- *   rekomendasi.getRekomendasi(keyword)
- *        │
- *        ├─► Jika keyword = rasa (manis/pahit/dll)   → getRekomendasiByRasa(keyword)
- *        ├─► Jika keyword = suhu (dingin/panas/dll)  → getRekomendasiBySuhu(keyword)
- *        └─► Jika keyword = null / tidak dikenal     → getRekomendasiBestseller()
- *        │
- *        ▼
- *   return String (daftar rekomendasi yang diformat)
+ * RecomendationHandler menangani penyaringan rekomendasi menu
+ * berdasarkan kategori, rasa, suhu, dan prioritas bestseller.
  */
 public class RecomendationHandler {
 
-    // =========================================================
-    // FIELD / ATRIBUT
-    // =========================================================
+    private MenuDAO menuDAO;
 
-    // TODO: Deklarasikan MenuDAO sebagai field untuk mengakses database.
-    //       Contoh:
-    //       private MenuDAO menuDAO;
+    private static final String[] KATA_KUNCI_RASA = {"manis", "pahit", "asam", "gurih", "creamy", "fruity"};
+    private static final String[] KATA_KUNCI_SUHU = {"panas", "dingin", "iced", "hot"};
 
-    // Daftar kata kunci rasa yang dikenali oleh sistem rekomendasi
-    // TODO: Gunakan array atau List ini saat melakukan pengecekan keyword di getRekomendasi()
-    //       private static final String[] KATA_KUNCI_RASA = {"manis", "pahit", "asam", "gurih", "creamy", "fruity"};
-
-    // Daftar kata kunci suhu yang dikenali oleh sistem rekomendasi
-    //       private static final String[] KATA_KUNCI_SUHU = {"panas", "dingin", "iced", "hot"};
-
-
-    // =========================================================
-    // CONSTRUCTOR
-    // =========================================================
-
-    /**
-     * TODO: Inisialisasi MenuDAO di sini.
-     *       Contoh: this.menuDAO = new MenuDAO();
-     */
     public RecomendationHandler() {
-        // TODO: Isi constructor ini
+        this.menuDAO = new MenuDAO();
     }
 
-
-    // =========================================================
-    // METHOD UTAMA: getRekomendasi()
-    // =========================================================
-
-    /**
-     * Entry point rekomendasi — dipanggil oleh ChatEngine.
-     *
-     * Method ini menentukan SKENARIO mana yang relevan berdasarkan keyword
-     * yang diekstrak oleh NLPService, lalu mendelegasikan ke method yang tepat.
-     *
-     * @param keyword kata kunci dari NLPService (bisa null jika tidak ada preferensi)
-     * @return String berisi daftar rekomendasi yang sudah diformat
-     *
-     * TODO: Implementasikan logika routing ini:
-     *   if (keyword ada di KATA_KUNCI_RASA) → return getRekomendasiByRasa(keyword)
-     *   if (keyword ada di KATA_KUNCI_SUHU) → return getRekomendasiBySuhu(keyword)
-     *   else                                → return getRekomendasiBestseller()
-     */
     public String getRekomendasi(String keyword) {
-        // TODO: Cek apakah keyword termasuk kata kunci rasa
-        // TODO: Cek apakah keyword termasuk kata kunci suhu
-        // TODO: Jika tidak keduanya (keyword null atau tidak dikenal) → tampilkan bestseller
+        String ctxKategori = null;
+        String ctxKriteria = null;
 
-        return ""; // TODO: Hapus baris ini setelah implementasi selesai
+        // Keyword dari NLPService dikirim dengan format kategori|kriteria.
+        if (keyword != null && keyword.contains("|")) {
+            String[] parts = keyword.split("\\|");
+            if (parts.length > 0 && !parts[0].isEmpty()) {
+                ctxKategori = parts[0];
+            }
+            if (parts.length > 1 && !parts[1].isEmpty()) {
+                ctxKriteria = parts[1];
+            }
+        } else if (keyword != null) {
+            ctxKriteria = keyword;
+        }
+
+        return getRekomendasiFiltered(ctxKategori, ctxKriteria);
     }
 
+    private String getRekomendasiFiltered(String ctxKategori, String ctxKriteria) {
+        List<Menu> sourceList = menuDAO.getAllMenu();
 
-    // =========================================================
-    // METHOD HELPER — Masing-masing menangani satu skenario
-    // =========================================================
+        // Filter kategori.
+        if (ctxKategori != null) {
+            String finalCtxKategori = ctxKategori;
+            sourceList = sourceList.stream()
+                    .filter(m -> matchKategoriContext(m.getKategori(), finalCtxKategori))
+                    .collect(Collectors.toList());
+        }
 
-    /**
-     * Skenario 1 — Rekomendasi berdasarkan profil rasa.
-     * Dipanggil saat keyword adalah: manis, pahit, asam, gurih, creamy, fruity.
-     *
-     * @param rasa kata kunci rasa (contoh: "manis", "pahit")
-     * @return String daftar menu yang cocok dengan rasa tersebut
-     *
-     * TODO: Panggil menuDAO.getMenuByKriteria(rasa).
-     *       Jika list kosong → return "Maaf, tidak ada menu dengan rasa tersebut saat ini."
-     *       Jika ada → format hasilnya seperti:
-     *         "Rekomendasi menu dengan rasa {rasa}:\n
-     *          - {namaMenu} — Rp {harga}\n  {deskripsi}\n"
-     */
-    private String getRekomendasiByRasa(String rasa) {
-        // TODO: Panggil menuDAO.getMenuByKriteria(rasa)
-        // TODO: Tangani list kosong
-        // TODO: Format output dan kembalikan sebagai String
-        return "";
+        // Filter rasa atau suhu.
+        if (ctxKriteria != null) {
+            String finalCtx = ctxKriteria.toLowerCase();
+            if (Arrays.asList(KATA_KUNCI_SUHU).contains(finalCtx)) {
+                String tgtSuhu = finalCtx.equals("iced") ? "dingin" : finalCtx.equals("hot") ? "panas" : finalCtx;
+                sourceList = sourceList.stream()
+                        .filter(m -> m.getSuhuSajian() != null && m.getSuhuSajian().toLowerCase().contains(tgtSuhu))
+                        .collect(Collectors.toList());
+            } else if (Arrays.asList(KATA_KUNCI_RASA).contains(finalCtx)) {
+                sourceList = sourceList.stream()
+                        .filter(m -> m.getProfilRasa() != null && m.getProfilRasa().toLowerCase().contains(finalCtx))
+                        .collect(Collectors.toList());
+            }
+        } else {
+            sourceList = sourceList.stream().filter(Menu::isBestseller).collect(Collectors.toList());
+        }
+
+        if (sourceList.isEmpty()) {
+            return "Maaf, saat ini kami belum punya rekomendasi yang pas untuk pencarianmu.";
+        }
+
+        // Bestseller ditampilkan lebih dulu.
+        List<Menu> sortedList = sourceList.stream()
+                .sorted((m1, m2) -> Boolean.compare(m2.isBestseller(), m1.isBestseller()))
+                .collect(Collectors.toList());
+
+        StringBuilder sb = new StringBuilder();
+        if (ctxKategori == null && ctxKriteria == null) {
+            sb.append("Kalau kamu bingung, ini nih Menu Bestseller paling direkomendasikan di DEMIKOPI:\n\n");
+        } else {
+            sb.append("Tentu! Kalau kamu cari ");
+            if (ctxKategori != null) {
+                sb.append(ctxKategori).append(" ");
+            }
+            if (ctxKriteria != null) {
+                sb.append("yang ").append(ctxKriteria).append(" ");
+            }
+            sb.append("aku sangat merekomendasikan:\n\n");
+        }
+
+        int count = 1;
+        for (Menu menu : sortedList) {
+            sb.append(count).append(". ").append(menu.getNamaMenu())
+                    .append(" (").append(menu.getKategori()).append(") — Rp ").append(menu.getHarga());
+
+            if (menu.isBestseller()) {
+                sb.append(" [Bestseller]");
+            }
+            sb.append("\n   >> ").append(menu.getDeskripsiMenu()).append("\n\n");
+            count++;
+        }
+
+        return sb.toString().trim();
     }
 
-    /**
-     * Skenario 2 — Rekomendasi berdasarkan suhu sajian.
-     * Dipanggil saat keyword adalah: panas, dingin, iced, hot.
-     *
-     * Normalisasi keyword:
-     *   "iced"  → gunakan "Dingin" saat query ke DB
-     *   "hot"   → gunakan "Panas"  saat query ke DB
-     *
-     * @param suhu kata kunci suhu (contoh: "dingin", "panas")
-     * @return String daftar menu yang sesuai suhu tersebut
-     *
-     * TODO: Ambil semua menu dari menuDAO.getAllMenu().
-     *       Filter berdasarkan menu.getSuhuSajian() yang mengandung keyword suhu.
-     *       Jika hasil filter kosong → return pesan "tidak ada menu dengan suhu tersebut".
-     *       Jika ada → format dan kembalikan hasilnya.
-     */
-    private String getRekomendasiBySuhu(String suhu) {
-        // TODO: Normalisasi keyword suhu ("iced" → "Dingin", "hot" → "Panas")
-        // TODO: Panggil menuDAO.getAllMenu()
-        // TODO: Filter dengan stream atau loop: menu.getSuhuSajian().contains(suhu)
-        // TODO: Tangani hasil kosong
-        // TODO: Format output dan kembalikan sebagai String
-        return "";
-    }
-
-    /**
-     * Skenario 3 — Rekomendasi menu bestseller (tanpa preferensi spesifik).
-     * Dipanggil saat user hanya berkata "rekomendasiin dong" tanpa detail.
-     *
-     * ⚠️ PERHATIAN: menuDAO.getMBestSeller() BELUM SELESAI DIIMPLEMENTASI.
-     *    Sebelum method ini bisa berjalan, kamu harus:
-     *    1. Perbaiki query di MenuDAO.getMBestSeller() → tambahkan kondisi WHERE is_bestseller = true
-     *    2. Pastikan result set di-map menjadi objek Menu yang benar
-     *    3. Kembalikan List<Menu> yang terisi, bukan list kosong
-     *
-     * @return String daftar menu bestseller yang diformat
-     *
-     * TODO (setelah MenuDAO.getMBestSeller() diperbaiki):
-     *   Panggil menuDAO.getMBestSeller().
-     *   Format hasilnya menjadi daftar rekomendasi yang menarik.
-     *   Tambahkan label "⭐ BESTSELLER" atau sejenisnya di header.
-     */
-    private String getRekomendasiBestseller() {
-        // TODO: [PRIORITAS TINGGI] Perbaiki MenuDAO.getMBestSeller() terlebih dahulu!
-        //       Query saat ini tidak lengkap (WHERE clause hilang + result set tidak di-map).
-
-        // TODO: Setelah MenuDAO diperbaiki, panggil menuDAO.getMBestSeller()
-        // TODO: Format output seperti:
-        //         "⭐ Menu Bestseller DEMIKOPI:\n
-        //          - {namaMenu} ({kategori}) — Rp {harga}\n  {deskripsi}\n"
-        // TODO: Tangani kasus list kosong
-        return "";
+    private boolean matchKategoriContext(String dbKategori, String ctxKategori) {
+        dbKategori = dbKategori.toLowerCase();
+        if (ctxKategori.equals("makanan")) {
+            return dbKategori.equals("makanan");
+        } else if (ctxKategori.equals("minuman")) {
+            return dbKategori.equals("kopi") || dbKategori.equals("non-kopi") || dbKategori.equals("mix");
+        } else if (ctxKategori.equals("kopi")) {
+            return dbKategori.equals("kopi") || dbKategori.equals("mix");
+        } else if (ctxKategori.equals("non-kopi")) {
+            return dbKategori.equals("non-kopi") || dbKategori.equals("mix");
+        }
+        return true;
     }
 }
-
