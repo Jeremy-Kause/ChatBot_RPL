@@ -1,0 +1,44 @@
+.root {
+    /* Nama variabel sesuai permintaanmu */
+    fx-primary: #6F4E37;
+    fx-background: #FAF7F2;
+    fx-white: #FFFFFF;
+}
+
+.main-bg {
+    -fx-background-color: fx-background;
+}
+
+/* Tombol Kirim & Login */
+.button-primary {
+    -fx-background-color: fx-primary;
+    -fx-text-fill: fx-white;
+    -fx-background-radius: 50;
+    -fx-cursor: hand;
+}
+
+/* Tombol New Chat */
+.button-outline {
+    -fx-background-color: transparent;
+    -fx-border-color: fx-primary;
+    -fx-border-radius: 10;
+    -fx-text-fill: fx-primary;
+}
+
+/* Bubble Chat Bot */
+.bubble-bot {
+    -fx-background-color: fx-white;
+    -fx-border-color: #D3D3D3;
+    -fx-border-radius: 0 15 15 15;
+    -fx-background-radius: 0 15 15 15;
+    -fx-padding: 10;
+}
+
+/* Input Field */
+.text-input {
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: #D3D3D3;
+    -fx-background-color: fx-white;
+    -fx-padding: 8 15;
+}
