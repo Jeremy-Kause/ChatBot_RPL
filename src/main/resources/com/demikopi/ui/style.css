@@ -5,33 +5,98 @@
 }
 
 .main-bg {
-    -fx-background-color: -fx-background;
+    -fx-background-color: #FAF7F2;
+}
+
+.header-container {
+    -fx-background-color: white;
+    -fx-border-color: #D3D3D3;
+    -fx-border-width: 0 0 1 0;
+}
+
+.logo-circle {
+    -fx-background-color: #6F4E37;
+    -fx-background-radius: 50;
+}
+
+.admin-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 18;
+    -fx-text-fill: #333333;
+}
+
+.admin-subtitle {
+    -fx-text-fill: #888888;
+}
+
+.btn-logout {
+    -fx-background-color: #FFF5F5;
+    -fx-border-color: #FFAAAA;
+    -fx-text-fill: #FF5C5C;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
 }
 
 .button-primary {
-    -fx-background-color: -fx-primary;
-    -fx-text-fill: -fx-white;
-    -fx-background-radius: 50;
+    -fx-background-color: #6F4E37;
+    -fx-text-fill: white;
+    -fx-background-radius: 20;
+    -fx-padding: 10 20;
 }
+
+.content-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 20;
+    -fx-text-fill: #6F4E37;
+}
+
+/* Tabel */
+.menu-table {
+    -fx-background-color: white;
+    -fx-border-radius: 10;
+}
+
+.menu-table .column-header {
+    -fx-background-color: #6F4E37;
+}
+
+.menu-table .column-header .label {
+    -fx-text-fill: white;
+}
+.login-card {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 10);
+    -fx-padding: 40;
+}
+
+/* Judul Login */
+.login-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 18;
+    -fx-text-fill: #333333;
+}
+
+.login-subtitle {
+    -fx-font-size: 14;
+    -fx-text-fill: #666666;
+}
+
+/* Input Field (Sudah ada di kode sebelumnya, pastikan ini ada) */
+.text-input {
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #D3D3D3;
+    -fx-background-color: white;
+    -fx-padding: 10 15;
+}
+
+/* Button Outline (Untuk tombol Register) */
 .button-outline {
     -fx-background-color: transparent;
     -fx-border-color: -fx-primary;
     -fx-border-radius: 10;
     -fx-text-fill: -fx-primary;
-}
-.bubble-bot {
-    -fx-background-color: -fx-white;
-    -fx-text-fill: #333333;
-    -fx-border-color: #D3D3D3;
-    -fx-border-radius: 0 15 15 15;
-    -fx-background-radius: 0 15 15 15;
-    -fx-padding: 10 15 10 15;
-}
-
-.text-input {
-    -fx-background-radius: 20;
-    -fx-border-radius: 20;
-    -fx-border-color: #D3D3D3;
-    -fx-background-color: -fx-white;
-    -fx-padding: 8 15;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
 }

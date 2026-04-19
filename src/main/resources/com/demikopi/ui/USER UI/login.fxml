@@ -1,29 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
 
-<StackPane stylesheets="@../style.css" styleClass="main-bg" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
-    <VBox alignment="CENTER" spacing="20" maxWidth="400" maxHeight="500"
-          style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 10); -fx-background-radius: 15;">
-        <padding>
-            <Insets top="40" right="40" bottom="40" left="40"/>
-        </padding>
+<StackPane prefHeight="600.0" prefWidth="900.0" styleClass="main-bg" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
 
-        <!-- Logo Placeholder -->
-        <Region style="-fx-background-color: #6F4E37; -fx-shape: 'M 50 50 m -40 0 a 40 40 0 1 0 80 0 a 40 40 0 1 0 -80 0'; " prefHeight="60" prefWidth="60"/>
+    <VBox alignment="CENTER" maxWidth="400" spacing="25" styleClass="login-card" StackPane.alignment="CENTER">
 
-        <Label text="DemiKopi Coffee Assistant" style="-fx-font-weight: bold; -fx-font-size: 16;"/>
-        <Label text="Login" style="-fx-font-size: 14;"/>
+        <!-- Logo Bulat Cokelat -->
+        <Region prefHeight="70" prefWidth="70" maxWidth="70" styleClass="logo-circle" />
 
+        <VBox alignment="CENTER" spacing="5">
+            <Label styleClass="login-title" text="DemiKopi Coffee Assistant" />
+            <Label styleClass="login-subtitle" text="Silakan masuk ke akun Anda" />
+        </VBox>
+
+        <!-- Form Input -->
+        <VBox spacing="15">
+            <TextField promptText="Username" styleClass="text-input" />
+            <PasswordField promptText="Password" styleClass="text-input" />
+        </VBox>
+
+        <!-- Action Buttons -->
         <VBox spacing="10">
-            <TextField promptText="Username" styleClass="text-input"/>
-            <PasswordField promptText="Password" styleClass="text-input"/>
+            <Button maxWidth="Infinity" styleClass="button-primary" text="Login">
+                <padding>
+                    <Insets bottom="12" top="12" />
+                </padding>
+            </Button>
+
+            <Button maxWidth="Infinity" styleClass="button-outline" text="Register">
+                <padding>
+                    <Insets bottom="12" top="12" />
+                </padding>
+            </Button>
         </VBox>
 
-        <VBox spacing="10" fillWidth="true">
-            <Button text="Login" maxWidth="Infinity" styleClass="button-primary"/>
-            <Button text="Register" maxWidth="Infinity" styleClass="button-outline"/>
-        </VBox>
     </VBox>
 </StackPane>
