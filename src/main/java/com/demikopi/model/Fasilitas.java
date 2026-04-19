@@ -11,9 +11,7 @@ public class Fasilitas {
         this.deskripsiFasilitas = deskripsiFasilitas;
     }
 
-    public String getIdFasilitas() {
-        return idFasilitas;
-    }
+    public String getIdFasilitas() {return idFasilitas;}
     public String getNamaFasilitas() {
         return namaFasilitas;
     }

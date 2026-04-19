@@ -54,14 +54,11 @@ public class FasilitasDAO extends DatabaseConfig {
 
     public boolean tambahFasilitas(Fasilitas fasilitas) {
         String query = "INSERT INTO fasilitas " +
-                "(id_fasilitas, nama_fasilitas, deskripsi_fasilitas) " +
-                "VALUES (?, ?, ?)";
-
+                "(nama_fasilitas, deskripsi_fasilitas) " +
+                "VALUES (?, ?)";
         try (PreparedStatement myStmt = conn.prepareStatement(query)) {
-            myStmt.setString(1, fasilitas.getIdFasilitas());
-            myStmt.setString(2, fasilitas.getNamaFasilitas());
-            myStmt.setString(3, fasilitas.getDeskripsiFasilitas());
-
+            myStmt.setString(1, fasilitas.getNamaFasilitas());
+            myStmt.setString(2, fasilitas.getDeskripsiFasilitas());
             return myStmt.executeUpdate() == 1;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -94,4 +91,4 @@ public class FasilitasDAO extends DatabaseConfig {
         }
     }
 }
-// Done
+// Done 
