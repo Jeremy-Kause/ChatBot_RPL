@@ -1,10 +1,10 @@
-package com.demikopi.ui;
+package com.demikopi.uiHandler;
 
 import javafx.application.Application;
 
 public class Launcher {
     public static void main(String[] args) {
-        Application.launch(HelloApplication.class, args);
+        Application.launch(UserUI.class, args);
     }
 }
 

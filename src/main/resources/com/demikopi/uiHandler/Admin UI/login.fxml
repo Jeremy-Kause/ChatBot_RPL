@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane fx:controller="com.demikopi.uiHandler.AdminLoginController" prefHeight="600.0" prefWidth="900.0" styleClass="main-bg" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+
+    <VBox alignment="CENTER" maxWidth="400" spacing="25" styleClass="login-card" StackPane.alignment="CENTER">
+
+        <!-- Logo Bulat Cokelat -->
+        <Region maxWidth="70" prefHeight="70" prefWidth="70" styleClass="logo-circle" />
+
+        <VBox alignment="CENTER" spacing="5">
+            <Label styleClass="login-title" text="Chatbot DemiKopi Admin" textAlignment="CENTER" />
+            <Label styleClass="login-subtitle" text="Silakan masuk ke akun Anda" />
+        </VBox>
+
+        <!-- Form Input -->
+        <VBox spacing="15">
+            <TextField fx:id="usernameInput" promptText="Username" styleClass="text-input" />
+            <PasswordField fx:id="passInput" promptText="Password" styleClass="text-input" />
+        </VBox>
+
+        <!-- Action Buttons -->
+        <VBox spacing="10">
+            <Button maxWidth="Infinity" styleClass="button-primary" text="Login" onAction="#handleLogin">
+                <padding>
+                    <Insets bottom="12" top="12" />
+                </padding>
+            </Button>
+        </VBox>
+
+    </VBox>
+</StackPane>
