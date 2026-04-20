@@ -59,7 +59,7 @@ public class ChatEngine {
 
     // Respons intent salam.
     private String buildResponseSalam() {
-        return "Halo! Selamat datang di DEMIKOPI\n" +
+        return "Halo! Selamat datang di DEMIKOPI. Aku adalah asisten chatbot.\n" +
                "Ada yang bisa aku bantu? Kamu bisa tanya soal menu, rekomendasi, " +
                "jam buka, lokasi, atau fasilitas kami!";
     }

@@ -5,6 +5,6 @@ module com.template.demikopu {
     requires mysql.connector.j;
 
 
-    opens com.demikopi.ui to javafx.fxml;
-    exports com.demikopi.ui;
+    opens com.demikopi.uiHandler to javafx.fxml;
+    exports com.demikopi.uiHandler;
 }

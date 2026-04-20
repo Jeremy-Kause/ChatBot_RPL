@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="600.0" prefWidth="900.0" styleClass="main-bg" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:controller="com.demikopi.uiHandler.AdminDashboardController" prefHeight="600.0" prefWidth="900.0" styleClass="main-bg" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
 
     <!-- HEADER ADMIN -->
     <top>
