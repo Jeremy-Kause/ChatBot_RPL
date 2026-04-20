@@ -26,15 +26,12 @@ public class AdminLoginController {
     private void handleLogin() {
         String username = usernameInput.getText().trim();
         String password = passInput.getText().trim();
-
         if (username == null || username.trim().isEmpty()
                 || password == null || password.trim().isEmpty()) {
             showAlert("Login gagal", "Username dan password wajib diisi.");
             return;
         }
-
         boolean loginBerhasil = adminAuth.login(username, password);
-
         if (loginBerhasil) {
             bukaDashboardAdmin();
         } else {
@@ -49,7 +46,6 @@ public class AdminLoginController {
                 showAlert("Error", "File admin-dashboard.fxml tidak ditemukan.");
                 return;
             }
-
             FXMLLoader loader = new FXMLLoader(dashboardUrl);
             Scene scene = new Scene(loader.load(), 900, 600);
             Stage stage = (Stage) usernameInput.getScene().getWindow();
@@ -68,3 +64,4 @@ public class AdminLoginController {
         alert.showAndWait();
     }
 }
+// Done
