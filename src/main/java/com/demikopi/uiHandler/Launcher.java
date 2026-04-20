@@ -7,4 +7,3 @@ public class Launcher {
         Application.launch(UserUI.class, args);
     }
 }
-
