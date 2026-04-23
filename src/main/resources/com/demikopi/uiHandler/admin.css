@@ -1,0 +1,358 @@
+.root {
+    -fx-primary: #6F4E37;
+    -fx-background: #FAF7F2;
+    -fx-surface: #FFFFFF;
+    -fx-border: #E4D8CC;
+    -fx-text-dark: #333333;
+    -fx-text-muted: #777777;
+}
+
+.main-bg {
+    -fx-background-color: -fx-background;
+}
+
+.sidebar {
+    -fx-background-color: #5B3F31;
+}
+
+.sidebar-logo-box {
+    -fx-padding: 8 0 4 0;
+}
+
+.sidebar-logo {
+    -fx-font-size: 22;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.sidebar-logo-sub {
+    -fx-font-size: 12;
+    -fx-text-fill: #EADFD6;
+}
+
+.nav-section-label {
+    -fx-font-size: 11;
+    -fx-font-weight: bold;
+    -fx-text-fill: #D8C7BC;
+    -fx-padding: 8 6 6 6;
+}
+
+.nav-item {
+    -fx-background-color: transparent;
+    -fx-background-radius: 10;
+    -fx-text-fill: white;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 12 14;
+    -fx-font-size: 13;
+    -fx-cursor: hand;
+}
+
+.nav-item:hover {
+    -fx-background-color: #6F4E37;
+}
+
+.nav-active {
+    -fx-background-color: #7B5A46;
+    -fx-font-weight: bold;
+}
+
+.nav-logout {
+    -fx-background-color: #6A4A3A;
+}
+
+.content-area {
+    -fx-background-color: transparent;
+}
+
+.page-title {
+    -fx-font-size: 28;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-primary;
+}
+
+.page-subtitle {
+    -fx-font-size: 13;
+    -fx-text-fill: -fx-text-muted;
+}
+
+.date-label {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-border-color: -fx-border;
+    -fx-border-radius: 20;
+    -fx-padding: 8 14;
+    -fx-text-fill: -fx-text-muted;
+}
+
+.login-card {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-border-color: -fx-border;
+    -fx-border-radius: 15;
+    -fx-padding: 40;
+}
+
+.logo-circle {
+    -fx-background-color: -fx-primary;
+    -fx-background-radius: 50;
+}
+
+.login-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 18;
+    -fx-text-fill: -fx-text-dark;
+}
+
+.login-subtitle {
+    -fx-font-size: 14;
+    -fx-text-fill: #666666;
+}
+
+.text-input,
+.search-field,
+.settings-field {
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #D3D3D3;
+    -fx-background-color: white;
+    -fx-padding: 10 15;
+}
+
+.button-primary,
+.btn-refresh,
+.primary-button-label {
+    -fx-background-color: -fx-primary;
+    -fx-text-fill: white;
+    -fx-background-radius: 12;
+    -fx-padding: 10 16;
+    -fx-font-weight: bold;
+}
+
+.content-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+
+.content-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.page-shell {
+    -fx-background-color: transparent;
+}
+
+.stat-card,
+.table-section,
+.mini-card,
+.menu-card {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+    -fx-border-color: -fx-border;
+    -fx-border-radius: 16;
+}
+
+.stat-card {
+    -fx-padding: 18;
+}
+
+.table-section,
+.mini-card,
+.menu-card {
+    -fx-padding: 16;
+}
+
+.dim-card {
+    -fx-background-color: #F6F1EB;
+}
+
+.stat-label,
+.card-subtitle,
+.mini-card-title,
+.form-label {
+    -fx-font-size: 12;
+    -fx-text-fill: -fx-text-muted;
+}
+
+.stat-value {
+    -fx-font-size: 30;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-dark;
+}
+
+.stat-value-sm,
+.mini-card-value {
+    -fx-font-size: 22;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-dark;
+}
+
+.section-title,
+.menu-card-title {
+    -fx-font-size: 18;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-dark;
+}
+
+.stat-change-up {
+    -fx-font-size: 12;
+    -fx-text-fill: #2E9D59;
+}
+
+.stat-change-neutral {
+    -fx-font-size: 12;
+    -fx-text-fill: -fx-text-muted;
+}
+
+.chip {
+    -fx-background-color: #EFE6DC;
+    -fx-background-radius: 20;
+    -fx-padding: 7 12;
+    -fx-text-fill: #6E594D;
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+}
+
+.chip-highlight {
+    -fx-background-color: -fx-primary;
+    -fx-text-fill: white;
+}
+
+.list-header {
+    -fx-alignment: center-left;
+    -fx-padding: 6 4 8 4;
+    -fx-border-color: #F0E6DD;
+    -fx-border-width: 0 0 1 0;
+    -fx-spacing: 12;
+}
+
+.list-header-label {
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+    -fx-text-fill: #7C6759;
+    -fx-pref-width: 96;
+}
+
+.flex-label {
+    -fx-max-width: Infinity;
+    -fx-pref-width: 120;
+}
+
+.list-wide {
+    -fx-pref-width: 320;
+}
+
+.list-row,
+.user-row {
+    -fx-alignment: center-left;
+    -fx-padding: 10 4;
+    -fx-border-color: #F3EBE4;
+    -fx-border-width: 0 0 1 0;
+    -fx-spacing: 12;
+}
+
+.row-title {
+    -fx-font-size: 13;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2E241D;
+}
+
+.row-text {
+    -fx-font-size: 12;
+    -fx-text-fill: #725F53;
+}
+
+.row-meta {
+    -fx-font-size: 12;
+    -fx-text-fill: #9A867A;
+    -fx-pref-width: 76;
+}
+
+.wide-meta {
+    -fx-pref-width: 170;
+}
+
+.row-pill {
+    -fx-background-radius: 20;
+    -fx-padding: 6 10;
+    -fx-font-size: 11;
+    -fx-font-weight: bold;
+}
+
+.pill-green {
+    -fx-background-color: #DCF7E7;
+    -fx-text-fill: #2F8D59;
+}
+
+.pill-brown {
+    -fx-background-color: #EFE6DC;
+    -fx-text-fill: #6F4E37;
+}
+
+.pill-orange {
+    -fx-background-color: #FFE8D7;
+    -fx-text-fill: #C26F2D;
+}
+
+.pill-neutral {
+    -fx-background-color: #ECECEC;
+    -fx-text-fill: #666666;
+}
+
+.pill-purple {
+    -fx-background-color: #ECE7FF;
+    -fx-text-fill: #6F54C8;
+}
+
+.soft-button {
+    -fx-background-color: #F5EDE5;
+    -fx-background-radius: 12;
+    -fx-padding: 8 12;
+    -fx-text-fill: -fx-primary;
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+}
+
+.compact-button {
+    -fx-padding: 6 10;
+}
+
+.menu-card-tag {
+    -fx-background-color: #F3EBE3;
+    -fx-background-radius: 20;
+    -fx-padding: 6 10;
+    -fx-text-fill: #7B6457;
+    -fx-font-size: 11;
+    -fx-font-weight: bold;
+}
+
+.price-chip {
+    -fx-background-color: #F8F1EA;
+    -fx-background-radius: 10;
+    -fx-padding: 6 10;
+    -fx-text-fill: -fx-primary;
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+}
+
+.accent-card {
+    -fx-background-color: #6F4E37;
+}
+
+.light-text {
+    -fx-text-fill: white;
+}
+
+.light-subtext {
+    -fx-text-fill: #E7D8CD;
+}
+
+.settings-check {
+    -fx-text-fill: #5F4C40;
+    -fx-font-size: 13;
+}
+
+.table-placeholder {
+    -fx-text-fill: #9A867A;
+    -fx-font-size: 13;
+}

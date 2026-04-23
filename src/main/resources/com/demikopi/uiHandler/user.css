@@ -1,0 +1,80 @@
+.root {
+    -fx-primary: #6F4E37;
+    -fx-background: #FAF7F2;
+    -fx-text-dark: #333333;
+    -fx-text-muted: #888888;
+}
+
+.main-bg {
+    -fx-background-color: -fx-background;
+}
+
+.header-container {
+    -fx-background-color: white;
+    -fx-border-color: #D3D3D3;
+    -fx-border-width: 0 0 1 0;
+}
+
+.logo-circle {
+    -fx-background-color: -fx-primary;
+    -fx-background-radius: 50;
+}
+
+.assistant-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 16;
+    -fx-text-fill: -fx-text-dark;
+}
+
+.assistant-status {
+    -fx-text-fill: #2E9D59;
+    -fx-font-size: 11;
+}
+
+.clear-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #888888;
+    -fx-cursor: hand;
+}
+
+.chat-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+
+.chat-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.chat-stream {
+    -fx-padding: 25;
+}
+
+.bubble-bot {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+    -fx-border-color: #E6DDD5;
+    -fx-border-radius: 16;
+    -fx-padding: 12 14;
+    -fx-text-fill: -fx-text-dark;
+}
+
+.input-bar {
+    -fx-background-color: transparent;
+}
+
+.text-input {
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #D3D3D3;
+    -fx-background-color: white;
+    -fx-padding: 10 15;
+}
+
+.send-button {
+    -fx-background-color: -fx-primary;
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-font-weight: bold;
+}
