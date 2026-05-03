@@ -2,6 +2,8 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
 <StackPane fx:controller="com.demikopi.uiHandler.AdminLoginController" prefHeight="600.0" prefWidth="900.0" styleClass="main-bg" stylesheets="@../admin.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
@@ -9,7 +11,16 @@
     <VBox alignment="CENTER" maxWidth="400" spacing="25" styleClass="login-card" StackPane.alignment="CENTER">
 
         <!-- Logo Bulat Cokelat -->
-        <Region maxWidth="70" prefHeight="70" prefWidth="70" styleClass="logo-circle" />
+        <StackPane maxHeight="70.0" maxWidth="70.0" prefHeight="70.0" prefWidth="70.0" styleClass="logo-circle">
+            <ImageView fitHeight="44.0" fitWidth="44.0" preserveRatio="true">
+                <image>
+                    <Image url="@../asset/coffee-cup.png" />
+                </image>
+                <effect>
+                    <ColorAdjust brightness="1.0" saturation="-1.0" />
+                </effect>
+            </ImageView>
+        </StackPane>
 
         <VBox alignment="CENTER" spacing="5">
             <Label styleClass="login-title" text="Chatbot DemiKopi Admin" textAlignment="CENTER" />

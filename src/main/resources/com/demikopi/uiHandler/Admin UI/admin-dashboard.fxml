@@ -2,9 +2,11 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="rootPane" prefHeight="720.0" prefWidth="1200.0" styleClass="main-bg" stylesheets="@../admin.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.demikopi.ui.AdminDashboardController">
+<BorderPane fx:id="rootPane" prefHeight="720.0" prefWidth="1200.0" styleClass="main-bg" stylesheets="@../admin.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.demikopi.uiHandler.AdminDashboardController">
 
     <left>
         <VBox prefWidth="220.0" styleClass="sidebar">
@@ -12,17 +14,28 @@
                 <Insets bottom="24.0" left="16.0" right="16.0" top="24.0" />
             </padding>
 
-            <VBox spacing="2.0" styleClass="sidebar-logo-box">
-                <Label styleClass="sidebar-logo" text="DemiKopi" />
-                <Label styleClass="sidebar-logo-sub" text="Admin Panel" />
-            </VBox>
+            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="sidebar-logo-box">
+                <StackPane maxHeight="42.0" maxWidth="42.0" prefHeight="42.0" prefWidth="42.0" styleClass="logo-circle">
+                    <ImageView fitHeight="28.0" fitWidth="28.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../asset/coffee-cup.png" />
+                        </image>
+                        <effect>
+                            <ColorAdjust brightness="1.0" saturation="-1.0" />
+                        </effect>
+                    </ImageView>
+                </StackPane>
+                <VBox spacing="2.0">
+                    <Label styleClass="sidebar-logo" text="DemiKopi" />
+                    <Label styleClass="sidebar-logo-sub" text="Admin Panel" />
+                </VBox>
+            </HBox>
 
             <Region prefHeight="24.0" />
 
             <Label styleClass="nav-section-label" text="MENU UTAMA" />
             <VBox spacing="4.0">
                 <Button maxWidth="Infinity" onAction="#showDashboard" styleClass="nav-item nav-active" text="Dashboard" />
-                <Button maxWidth="Infinity" onAction="#showChat" styleClass="nav-item" text="Riwayat Chat" />
                 <Button maxWidth="Infinity" onAction="#showMenu" styleClass="nav-item" text="Manajemen Menu" />
             </VBox>
 
@@ -48,7 +61,7 @@
             <HBox alignment="CENTER_LEFT" spacing="12.0">
                 <VBox spacing="3.0">
                     <Label styleClass="page-title" text="Dashboard" />
-                    <Label styleClass="page-subtitle" text="Ringkasan aktivitas dan modul admin chatbot" />
+                    <Label styleClass="page-subtitle" text="Ringkasan modul admin chatbot" />
                 </VBox>
                 <Region HBox.hgrow="ALWAYS" />
             </HBox>
@@ -65,9 +78,9 @@
                             </columnConstraints>
 
                             <VBox spacing="6.0" styleClass="stat-card" GridPane.columnIndex="0">
-                                <Label styleClass="stat-label" text="Total Chat Hari Ini" />
-                                <Label styleClass="stat-value" text="--" />
-                                <Label styleClass="stat-change-up" text="Ringkasan" />
+                                <Label styleClass="stat-label" text="Status Chatbot" />
+                                <Label styleClass="stat-value-sm" text="Aktif" />
+                                <Label styleClass="stat-change-up" text="Siap melayani" />
                             </VBox>
 
                             <VBox spacing="6.0" styleClass="stat-card" GridPane.columnIndex="1">
@@ -77,9 +90,9 @@
                             </VBox>
 
                             <VBox spacing="6.0" styleClass="stat-card" GridPane.columnIndex="2">
-                                <Label styleClass="stat-label" text="Pengguna Aktif" />
-                                <Label styleClass="stat-value" text="--" />
-                                <Label styleClass="stat-change-neutral" text="Ringkasan" />
+                                <Label styleClass="stat-label" text="Mode Pengguna" />
+                                <Label styleClass="stat-value-sm" text="Tanpa Login" />
+                                <Label styleClass="stat-change-neutral" text="Chat langsung" />
                             </VBox>
 
                             <VBox spacing="6.0" styleClass="stat-card" GridPane.columnIndex="3">

@@ -2,99 +2,145 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="rootPane" prefHeight="720.0" prefWidth="1200.0" styleClass="main-bg" stylesheets="@../admin.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.demikopi.ui.AdminDashboardController">
+<BorderPane fx:id="rootPane" prefHeight="720.0" prefWidth="1200.0" styleClass="main-bg" stylesheets="@../admin.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.demikopi.uiHandler.MenuManagementController">
     <left>
         <VBox prefWidth="220.0" styleClass="sidebar">
-            <padding><Insets bottom="24.0" left="16.0" right="16.0" top="24.0" /></padding>
-            <VBox spacing="2.0" styleClass="sidebar-logo-box">
-                <Label styleClass="sidebar-logo" text="DemiKopi" />
-                <Label styleClass="sidebar-logo-sub" text="Admin Panel" />
-            </VBox>
+            <padding>
+                <Insets bottom="24.0" left="16.0" right="16.0" top="24.0" />
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="sidebar-logo-box">
+                <StackPane maxHeight="42.0" maxWidth="42.0" prefHeight="42.0" prefWidth="42.0" styleClass="logo-circle">
+                    <ImageView fitHeight="28.0" fitWidth="28.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../asset/coffee-cup.png" />
+                        </image>
+                        <effect>
+                            <ColorAdjust brightness="1.0" saturation="-1.0" />
+                        </effect>
+                    </ImageView>
+                </StackPane>
+                <VBox spacing="2.0">
+                    <Label styleClass="sidebar-logo" text="DemiKopi" />
+                    <Label styleClass="sidebar-logo-sub" text="Admin Panel" />
+                </VBox>
+            </HBox>
+
             <Region prefHeight="24.0" />
+
             <Label styleClass="nav-section-label" text="MENU UTAMA" />
             <VBox spacing="4.0">
                 <Button maxWidth="Infinity" onAction="#showDashboard" styleClass="nav-item" text="Dashboard" />
-                <Button maxWidth="Infinity" onAction="#showChat" styleClass="nav-item" text="Riwayat Chat" />
                 <Button maxWidth="Infinity" onAction="#showMenu" styleClass="nav-item nav-active" text="Manajemen Menu" />
             </VBox>
+
             <Region prefHeight="16.0" />
+
             <Label styleClass="nav-section-label" text="SISTEM" />
             <VBox spacing="4.0">
                 <Button maxWidth="Infinity" onAction="#showSettings" styleClass="nav-item" text="Pengaturan" />
             </VBox>
+
             <Region VBox.vgrow="ALWAYS" />
+
             <Button maxWidth="Infinity" onAction="#handleLogout" styleClass="nav-item nav-logout" text="Keluar" />
         </VBox>
     </left>
+
     <center>
         <VBox spacing="18.0" styleClass="content-area">
-            <padding><Insets bottom="24.0" left="24.0" right="24.0" top="24.0" /></padding>
+            <padding>
+                <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+            </padding>
+
             <HBox alignment="CENTER_LEFT" spacing="12.0">
                 <VBox spacing="3.0">
                     <Label styleClass="page-title" text="Manajemen Menu" />
-                    <Label styleClass="page-subtitle" text="Kelola daftar menu, kategori, dan status ketersediaan" />
+                    <Label styleClass="page-subtitle" text="Tambah, ubah, hapus, dan filter menu DemiKopi" />
                 </VBox>
                 <Region HBox.hgrow="ALWAYS" />
+                <Button onAction="#handleRefreshMenu" styleClass="soft-button" text="Refresh" />
             </HBox>
-            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="content-scroll" VBox.vgrow="ALWAYS">
-                <content>
-                    <VBox spacing="18.0" styleClass="page-shell">
-                        <VBox spacing="10.0" styleClass="table-section">
-                            <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                <VBox spacing="4.0">
-                                    <Label styleClass="section-title" text="Filter Menu" />
-                                    <Label styleClass="card-subtitle" text="Area filter menu" />
-                                </VBox>
-                                <Region HBox.hgrow="ALWAYS" />
-                                <Label styleClass="primary-button-label" text="+ Tambah Menu" />
-                            </HBox>
 
-                            <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                <Label styleClass="chip chip-highlight" text="Semua" />
-                                <Label styleClass="chip" text="Minuman" />
-                                <Label styleClass="chip" text="Makanan" />
-                            </HBox>
+            <HBox spacing="18.0" VBox.vgrow="ALWAYS">
+                <VBox spacing="12.0" styleClass="table-section" HBox.hgrow="ALWAYS">
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <VBox spacing="4.0">
+                            <Label styleClass="section-title" text="Daftar Menu" />
+                            <Label fx:id="statusMenuLabel" styleClass="card-subtitle" text="Menampilkan 0 dari 0 menu" />
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                    </HBox>
 
-                            <FlowPane hgap="10.0" vgap="10.0">
-                                <Label styleClass="chip" text="Kopi" />
-                                <Label styleClass="chip" text="Non-Kopi" />
-                                <Label styleClass="chip" text="Panas" />
-                                <Label styleClass="chip" text="Dingin" />
-                                <Label styleClass="chip" text="Snack" />
-                                <Label styleClass="chip" text="Bestseller" />
-                            </FlowPane>
-                        </VBox>
-                        <VBox spacing="14.0">
-                            <HBox spacing="14.0">
-                                <VBox spacing="10.0" styleClass="menu-card" HBox.hgrow="ALWAYS">
-                                    <Label styleClass="menu-card-tag" text="Kopi" />
-                                    <Label styleClass="menu-card-title" text="Nama Menu" />
-                                    <Label styleClass="row-text" text="Deskripsi singkat menu" wrapText="true" />
-                                    <HBox spacing="8.0">
-                                        <Label styleClass="price-chip" text="Harga" />
-                                        <Label styleClass="row-pill pill-green" text="Status" />
-                                        <Region HBox.hgrow="ALWAYS" />
-                                        <Label styleClass="soft-button compact-button" text="Edit" />
-                                    </HBox>
-                                </VBox>
-                                <VBox spacing="10.0" styleClass="menu-card" HBox.hgrow="ALWAYS">
-                                    <Label styleClass="menu-card-tag" text="Kategori" />
-                                    <Label styleClass="menu-card-title" text="Nama Menu" />
-                                    <Label styleClass="row-text" text="Deskripsi singkat menu" wrapText="true" />
-                                    <HBox spacing="8.0">
-                                        <Label styleClass="price-chip" text="Harga" />
-                                        <Label styleClass="row-pill pill-brown" text="Status" />
-                                        <Region HBox.hgrow="ALWAYS" />
-                                        <Label styleClass="soft-button compact-button" text="Edit" />
-                                    </HBox>
-                                </VBox>
-                            </HBox>
-                        </VBox>
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <TextField fx:id="searchInput" onKeyReleased="#handleCariMenu" promptText="Cari nama, kategori, rasa, atau sajian..." styleClass="search-field" HBox.hgrow="ALWAYS" />
+                        <ComboBox fx:id="statusFilterInput" onAction="#handleFilterMenu" prefWidth="150.0" styleClass="settings-field" />
+                    </HBox>
+
+                    <TableView fx:id="menuTable" styleClass="menu-table" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="namaMenuColumn" prefWidth="190.0" text="Nama Menu" />
+                            <TableColumn fx:id="kategoriColumn" prefWidth="110.0" text="Kategori" />
+                            <TableColumn fx:id="hargaColumn" prefWidth="110.0" text="Harga" />
+                            <TableColumn fx:id="statusColumn" prefWidth="90.0" text="Status" />
+                            <TableColumn fx:id="bestsellerColumn" prefWidth="90.0" text="Bestseller" />
+                        </columns>
+                    </TableView>
+                </VBox>
+
+                <VBox prefWidth="340.0" spacing="12.0" styleClass="table-section">
+                    <VBox spacing="4.0">
+                        <Label fx:id="formTitleLabel" styleClass="section-title" text="Tambah Menu" />
+                        <Label styleClass="card-subtitle" text="Pilih baris tabel untuk mengedit menu" />
                     </VBox>
-                </content>
-            </ScrollPane>
+
+                    <VBox spacing="6.0">
+                        <Label styleClass="form-label" text="Nama Menu" />
+                        <TextField fx:id="namaMenuInput" promptText="Contoh: Kopi Susu Gula Aren" styleClass="settings-field" />
+                    </VBox>
+
+                    <VBox spacing="6.0">
+                        <Label styleClass="form-label" text="Kategori" />
+                        <ComboBox fx:id="kategoriInput" maxWidth="Infinity" styleClass="settings-field" />
+                    </VBox>
+
+                    <VBox spacing="6.0">
+                        <Label styleClass="form-label" text="Profil Rasa" />
+                        <TextField fx:id="profilRasaInput" promptText="manis, creamy, caramel" styleClass="settings-field" />
+                    </VBox>
+
+                    <HBox spacing="10.0">
+                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="form-label" text="Suhu Sajian" />
+                            <TextField fx:id="suhuSajianInput" promptText="panas/dingin" styleClass="settings-field" />
+                        </VBox>
+                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="form-label" text="Harga" />
+                            <TextField fx:id="hargaInput" promptText="25000" styleClass="settings-field" />
+                        </VBox>
+                    </HBox>
+
+                    <VBox spacing="6.0">
+                        <Label styleClass="form-label" text="Deskripsi" />
+                        <TextArea fx:id="deskripsiInput" prefRowCount="4" promptText="Deskripsi singkat menu" styleClass="settings-field" wrapText="true" />
+                    </VBox>
+
+                    <HBox alignment="CENTER_LEFT" spacing="18.0">
+                        <CheckBox fx:id="bestsellerCheck" styleClass="settings-check" text="Bestseller" />
+                        <CheckBox fx:id="tersediaCheck" styleClass="settings-check" text="Tersedia" />
+                    </HBox>
+
+                    <HBox alignment="CENTER_RIGHT" spacing="8.0">
+                        <Button onAction="#handleBersihkanForm" styleClass="soft-button" text="Bersihkan" />
+                        <Button onAction="#handleHapusMenu" styleClass="danger-button" text="Hapus" />
+                        <Button onAction="#handleSimpanMenu" styleClass="button-primary" text="Simpan" />
+                    </HBox>
+                </VBox>
+            </HBox>
         </VBox>
     </center>
 </BorderPane>

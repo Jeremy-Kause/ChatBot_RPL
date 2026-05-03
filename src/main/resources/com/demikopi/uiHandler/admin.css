@@ -313,8 +313,23 @@
     -fx-font-weight: bold;
 }
 
+.danger-button {
+    -fx-background-color: #FDE7E4;
+    -fx-background-radius: 12;
+    -fx-padding: 8 12;
+    -fx-text-fill: #B42318;
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+}
+
 .compact-button {
     -fx-padding: 6 10;
+}
+
+.menu-table {
+    -fx-background-color: transparent;
+    -fx-border-color: #E8DDD3;
+    -fx-border-radius: 10;
 }
 
 .menu-card-tag {

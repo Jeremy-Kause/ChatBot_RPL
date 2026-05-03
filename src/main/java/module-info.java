@@ -6,5 +6,6 @@ module com.template.demikopu {
 
 
     opens com.demikopi.uiHandler to javafx.fxml;
+    exports com.demikopi.ui;
     exports com.demikopi.uiHandler;
 }

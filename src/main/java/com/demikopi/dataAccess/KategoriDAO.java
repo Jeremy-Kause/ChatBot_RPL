@@ -11,17 +11,19 @@ import java.util.List;
 public class KategoriDAO extends DatabaseConfig {
 
     public List<Kategori> getAllKategori() {
+        pastikanKoneksiTersedia();
         List<Kategori> kategoriList = new ArrayList<>();
         String query = "select * from kategori";
         try (PreparedStatement myStmt = conn.prepareStatement(query)) {
-            ResultSet myRs = myStmt.executeQuery();
-            while (myRs.next()) {
-                int id_kategori = myRs.getInt("id_kategori");
-                String kategori_name = myRs.getString("nama_kategori");
-                kategoriList.add(new Kategori(id_kategori, kategori_name));
+            try (ResultSet myRs = myStmt.executeQuery()) {
+                while (myRs.next()) {
+                    int id_kategori = myRs.getInt("id_kategori");
+                    String kategori_name = myRs.getString("nama_kategori");
+                    kategoriList.add(new Kategori(id_kategori, kategori_name));
+                }
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            throw new IllegalStateException("Gagal membaca data kategori: " + e.getMessage(), e);
         }
         return kategoriList;
     }

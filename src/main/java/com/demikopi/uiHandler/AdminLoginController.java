@@ -24,18 +24,23 @@ public class AdminLoginController {
 
     @FXML
     private void handleLogin() {
-        String username = usernameInput.getText().trim();
-        String password = passInput.getText().trim();
+        String username = usernameInput.getText();
+        String password = passInput.getText();
         if (username == null || username.trim().isEmpty()
                 || password == null || password.trim().isEmpty()) {
             showAlert("Login gagal", "Username dan password wajib diisi.");
             return;
         }
-        boolean loginBerhasil = adminAuth.login(username, password);
-        if (loginBerhasil) {
-            bukaDashboardAdmin();
-        } else {
-            showAlert("Login gagal", "Username atau password salah.");
+
+        try {
+            boolean loginBerhasil = adminAuth.login(username.trim(), password.trim());
+            if (loginBerhasil) {
+                bukaDashboardAdmin();
+            } else {
+                showAlert("Login gagal", "Username atau password salah.");
+            }
+        } catch (IllegalStateException e) {
+            showAlert("Database bermasalah", e.getMessage());
         }
     }
 
@@ -47,12 +52,13 @@ public class AdminLoginController {
                 return;
             }
             FXMLLoader loader = new FXMLLoader(dashboardUrl);
-            Scene scene = new Scene(loader.load(), 900, 600);
+            Scene scene = new Scene(loader.load(), 1200, 720);
             Stage stage = (Stage) usernameInput.getScene().getWindow();
             stage.setTitle("DemiKopi Admin Dashboard");
             stage.setScene(scene);
         } catch (IOException e) {
-            showAlert("Error", "Gagal membuka dashboard admin.");
+            e.printStackTrace();
+            showAlert("Error", "Gagal membuka dashboard admin: " + e.getMessage());
         }
     }
 

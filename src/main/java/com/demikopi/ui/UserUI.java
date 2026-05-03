@@ -1,4 +1,4 @@
-package com.demikopi.uiHandler;
+package com.demikopi.ui;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
