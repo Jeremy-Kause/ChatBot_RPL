@@ -11,30 +11,23 @@
             <padding>
                 <Insets bottom="24.0" left="16.0" right="16.0" top="24.0" />
             </padding>
-
             <VBox spacing="2.0" styleClass="sidebar-logo-box">
                 <Label styleClass="sidebar-logo" text="DemiKopi" />
                 <Label styleClass="sidebar-logo-sub" text="Admin Panel" />
             </VBox>
-
             <Region prefHeight="24.0" />
-
             <Label styleClass="nav-section-label" text="MENU UTAMA" />
             <VBox spacing="4.0">
-                <Button maxWidth="Infinity" onAction="#showDashboard" styleClass="nav-item nav-active" text="Dashboard" />
-                <Button maxWidth="Infinity" onAction="#showChat" styleClass="nav-item" text="Riwayat Chat" />
+                <Button maxWidth="Infinity" onAction="#showDashboard" styleClass="nav-item" text="Dashboard" />
+                <Button maxWidth="Infinity" onAction="#showChat" styleClass="nav-item nav-active" text="Riwayat Chat" />
                 <Button maxWidth="Infinity" onAction="#showMenu" styleClass="nav-item" text="Manajemen Menu" />
             </VBox>
-
             <Region prefHeight="16.0" />
-
             <Label styleClass="nav-section-label" text="SISTEM" />
             <VBox spacing="4.0">
                 <Button maxWidth="Infinity" onAction="#showSettings" styleClass="nav-item" text="Pengaturan" />
             </VBox>
-
             <Region VBox.vgrow="ALWAYS" />
-
             <Button maxWidth="Infinity" onAction="#handleLogout" styleClass="nav-item nav-logout" text="Keluar" />
         </VBox>
     </left>
@@ -44,11 +37,10 @@
             <padding>
                 <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
             </padding>
-
             <HBox alignment="CENTER_LEFT" spacing="12.0">
                 <VBox spacing="3.0">
-                    <Label styleClass="page-title" text="Dashboard" />
-                    <Label styleClass="page-subtitle" text="Ringkasan aktivitas dan modul admin chatbot" />
+                    <Label styleClass="page-title" text="Riwayat Chat" />
+                    <Label styleClass="page-subtitle" text="Pantau percakapan terbaru dan kategori pertanyaan pengguna" />
                 </VBox>
                 <Region HBox.hgrow="ALWAYS" />
             </HBox>
@@ -69,88 +61,84 @@
                                 <Label styleClass="stat-value" text="--" />
                                 <Label styleClass="stat-change-up" text="Ringkasan" />
                             </VBox>
-
                             <VBox spacing="6.0" styleClass="stat-card" GridPane.columnIndex="1">
-                                <Label styleClass="stat-label" text="Pesanan Masuk" />
-                                <Label styleClass="stat-value" text="--" />
-                                <Label styleClass="stat-change-up" text="Ringkasan" />
-                            </VBox>
-
-                            <VBox spacing="6.0" styleClass="stat-card" GridPane.columnIndex="2">
-                                <Label styleClass="stat-label" text="Pengguna Aktif" />
+                                <Label styleClass="stat-label" text="Butuh Tindak Lanjut" />
                                 <Label styleClass="stat-value" text="--" />
                                 <Label styleClass="stat-change-neutral" text="Ringkasan" />
                             </VBox>
-
-                            <VBox spacing="6.0" styleClass="stat-card" GridPane.columnIndex="3">
-                                <Label styleClass="stat-label" text="Menu Populer" />
+                            <VBox spacing="6.0" styleClass="stat-card" GridPane.columnIndex="2">
+                                <Label styleClass="stat-label" text="Kategori Terbanyak" />
                                 <Label styleClass="stat-value-sm" text="--" />
                                 <Label styleClass="stat-change-up" text="Ringkasan" />
+                            </VBox>
+                            <VBox spacing="6.0" styleClass="stat-card" GridPane.columnIndex="3">
+                                <Label styleClass="stat-label" text="Waktu Tersibuk" />
+                                <Label styleClass="stat-value-sm" text="--" />
+                                <Label styleClass="stat-change-neutral" text="Ringkasan" />
                             </VBox>
                         </GridPane>
 
                         <HBox spacing="18.0">
                             <VBox spacing="12.0" styleClass="table-section" HBox.hgrow="ALWAYS">
-                                <HBox alignment="CENTER_LEFT">
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
                                     <VBox spacing="4.0">
-                                        <Label styleClass="section-title" text="Laporan Operasional" />
-                                        <Label styleClass="card-subtitle" text="Area laporan utama" />
+                                        <Label styleClass="section-title" text="Daftar Riwayat Chat" />
+                                        <Label styleClass="card-subtitle" text="Area daftar riwayat chat" />
                                     </VBox>
                                     <Region HBox.hgrow="ALWAYS" />
-                                    <Label styleClass="chip chip-highlight" text="Laporan" />
+                                    <Label styleClass="chip chip-highlight" text="Filter 1" />
+                                    <Label styleClass="chip" text="Filter 2" />
+                                </HBox>
+
+                                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                    <TextField prefWidth="240.0" promptText="Cari data..." styleClass="search-field" />
+                                    <Label styleClass="soft-button" text="Filter" />
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Label styleClass="soft-button" text="Export CSV" />
                                 </HBox>
 
                                 <HBox styleClass="list-header">
-                                    <Label styleClass="list-header-label flex-label" text="Bagian" />
-                                    <Label styleClass="list-header-label list-wide" text="Keterangan" />
-                                    <Label styleClass="list-header-label" text="Status" />
-                                    <Label styleClass="list-header-label" text="Update" />
+                                    <Label styleClass="list-header-label flex-label" text="Pengguna" />
+                                    <Label styleClass="list-header-label list-wide" text="Pesan Terakhir" />
+                                    <Label styleClass="list-header-label" text="Kategori" />
+                                    <Label styleClass="list-header-label" text="Waktu" />
+                                    <Label styleClass="list-header-label" text="Aksi" />
                                 </HBox>
 
                                 <HBox styleClass="list-row">
-                                    <Label styleClass="row-title flex-label" text="Bagian 1" />
-                                    <Label styleClass="row-text list-wide" text="Keterangan item laporan" />
-                                    <Label styleClass="row-pill pill-green" text="Status" />
+                                    <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="row-title" text="Nama 1" />
+                                        <Label styleClass="row-meta" text="ID" />
+                                    </VBox>
+                                    <Label styleClass="row-text list-wide" text="Pesan atau isi chat" />
+                                    <Label styleClass="row-pill pill-green" text="Kategori" />
+                                    <Label styleClass="row-meta" text="--:--" />
+                                    <Label styleClass="soft-button compact-button" text="Lihat" />
                                 </HBox>
 
                                 <HBox styleClass="list-row">
-                                    <Label styleClass="row-title flex-label" text="Bagian 2" />
-                                    <Label styleClass="row-text list-wide" text="Keterangan item laporan" />
-                                    <Label styleClass="row-pill pill-orange" text="Status" />
-                                </HBox>
-
-                                <HBox styleClass="list-row">
-                                    <Label styleClass="row-title flex-label" text="Bagian 3" />
-                                    <Label styleClass="row-text list-wide" text="Keterangan item laporan" />
-                                    <Label styleClass="row-pill pill-brown" text="Status" />
-                                </HBox>
-
-                                <HBox styleClass="list-row">
-                                    <Label styleClass="row-title flex-label" text="Bagian 4" />
-                                    <Label styleClass="row-text list-wide" text="Keterangan item laporan" />
-                                    <Label styleClass="row-pill pill-neutral" text="Status" />
+                                    <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="row-title" text="Nama 2" />
+                                        <Label styleClass="row-meta" text="ID" />
+                                    </VBox>
+                                    <Label styleClass="row-text list-wide" text="Pesan atau isi chat" />
+                                    <Label styleClass="row-pill pill-brown" text="Kategori" />
+                                    <Label styleClass="row-meta" text="--:--" />
+                                    <Label styleClass="soft-button compact-button" text="Lihat" />
                                 </HBox>
                             </VBox>
 
                             <VBox prefWidth="290.0" spacing="12.0" styleClass="side-panel">
                                 <Label styleClass="section-title" text="Panel Samping" />
-
                                 <VBox spacing="10.0" styleClass="mini-card">
-                                    <Label styleClass="mini-card-title" text="Performa Bot" />
+                                    <Label styleClass="mini-card-title" text="Pertanyaan Paling Sering" />
                                     <Label styleClass="mini-card-value" text="--" />
                                     <Label styleClass="card-subtitle" text="Keterangan ringkas" />
                                 </VBox>
-
                                 <VBox spacing="10.0" styleClass="mini-card">
-                                    <Label styleClass="mini-card-title" text="Top Kategori" />
+                                    <Label styleClass="mini-card-title" text="Respons Manual" />
                                     <Label styleClass="mini-card-value" text="--" />
                                     <Label styleClass="card-subtitle" text="Keterangan ringkas" />
-                                </VBox>
-
-                                <VBox spacing="10.0" styleClass="mini-card accent-card">
-                                    <Label styleClass="mini-card-title light-text" text="Agenda Hari Ini" />
-                                    <Label styleClass="mini-card-value light-text" text="--" />
-                                    <Label styleClass="card-subtitle light-subtext" text="Catatan tambahan" wrapText="true" />
                                 </VBox>
                             </VBox>
                         </HBox>
@@ -159,5 +147,4 @@
             </ScrollPane>
         </VBox>
     </center>
-
 </BorderPane>

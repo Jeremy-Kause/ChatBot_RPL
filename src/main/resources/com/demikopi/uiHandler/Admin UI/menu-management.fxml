@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="rootPane" prefHeight="720.0" prefWidth="1200.0" styleClass="main-bg" stylesheets="@../admin.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.demikopi.ui.AdminDashboardController">
+    <left>
+        <VBox prefWidth="220.0" styleClass="sidebar">
+            <padding><Insets bottom="24.0" left="16.0" right="16.0" top="24.0" /></padding>
+            <VBox spacing="2.0" styleClass="sidebar-logo-box">
+                <Label styleClass="sidebar-logo" text="DemiKopi" />
+                <Label styleClass="sidebar-logo-sub" text="Admin Panel" />
+            </VBox>
+            <Region prefHeight="24.0" />
+            <Label styleClass="nav-section-label" text="MENU UTAMA" />
+            <VBox spacing="4.0">
+                <Button maxWidth="Infinity" onAction="#showDashboard" styleClass="nav-item" text="Dashboard" />
+                <Button maxWidth="Infinity" onAction="#showChat" styleClass="nav-item" text="Riwayat Chat" />
+                <Button maxWidth="Infinity" onAction="#showMenu" styleClass="nav-item nav-active" text="Manajemen Menu" />
+            </VBox>
+            <Region prefHeight="16.0" />
+            <Label styleClass="nav-section-label" text="SISTEM" />
+            <VBox spacing="4.0">
+                <Button maxWidth="Infinity" onAction="#showSettings" styleClass="nav-item" text="Pengaturan" />
+            </VBox>
+            <Region VBox.vgrow="ALWAYS" />
+            <Button maxWidth="Infinity" onAction="#handleLogout" styleClass="nav-item nav-logout" text="Keluar" />
+        </VBox>
+    </left>
+    <center>
+        <VBox spacing="18.0" styleClass="content-area">
+            <padding><Insets bottom="24.0" left="24.0" right="24.0" top="24.0" /></padding>
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
+                <VBox spacing="3.0">
+                    <Label styleClass="page-title" text="Manajemen Menu" />
+                    <Label styleClass="page-subtitle" text="Kelola daftar menu, kategori, dan status ketersediaan" />
+                </VBox>
+                <Region HBox.hgrow="ALWAYS" />
+            </HBox>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="content-scroll" VBox.vgrow="ALWAYS">
+                <content>
+                    <VBox spacing="18.0" styleClass="page-shell">
+                        <VBox spacing="10.0" styleClass="table-section">
+                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                <VBox spacing="4.0">
+                                    <Label styleClass="section-title" text="Filter Menu" />
+                                    <Label styleClass="card-subtitle" text="Area filter menu" />
+                                </VBox>
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Label styleClass="primary-button-label" text="+ Tambah Menu" />
+                            </HBox>
+
+                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                <Label styleClass="chip chip-highlight" text="Semua" />
+                                <Label styleClass="chip" text="Minuman" />
+                                <Label styleClass="chip" text="Makanan" />
+                            </HBox>
+
+                            <FlowPane hgap="10.0" vgap="10.0">
+                                <Label styleClass="chip" text="Kopi" />
+                                <Label styleClass="chip" text="Non-Kopi" />
+                                <Label styleClass="chip" text="Panas" />
+                                <Label styleClass="chip" text="Dingin" />
+                                <Label styleClass="chip" text="Snack" />
+                                <Label styleClass="chip" text="Bestseller" />
+                            </FlowPane>
+                        </VBox>
+                        <VBox spacing="14.0">
+                            <HBox spacing="14.0">
+                                <VBox spacing="10.0" styleClass="menu-card" HBox.hgrow="ALWAYS">
+                                    <Label styleClass="menu-card-tag" text="Kopi" />
+                                    <Label styleClass="menu-card-title" text="Nama Menu" />
+                                    <Label styleClass="row-text" text="Deskripsi singkat menu" wrapText="true" />
+                                    <HBox spacing="8.0">
+                                        <Label styleClass="price-chip" text="Harga" />
+                                        <Label styleClass="row-pill pill-green" text="Status" />
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <Label styleClass="soft-button compact-button" text="Edit" />
+                                    </HBox>
+                                </VBox>
+                                <VBox spacing="10.0" styleClass="menu-card" HBox.hgrow="ALWAYS">
+                                    <Label styleClass="menu-card-tag" text="Kategori" />
+                                    <Label styleClass="menu-card-title" text="Nama Menu" />
+                                    <Label styleClass="row-text" text="Deskripsi singkat menu" wrapText="true" />
+                                    <HBox spacing="8.0">
+                                        <Label styleClass="price-chip" text="Harga" />
+                                        <Label styleClass="row-pill pill-brown" text="Status" />
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <Label styleClass="soft-button compact-button" text="Edit" />
+                                    </HBox>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>

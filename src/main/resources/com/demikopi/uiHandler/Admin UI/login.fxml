@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<StackPane fx:controller="com.demikopi.uiHandler.AdminLoginController" prefHeight="600.0" prefWidth="900.0" styleClass="main-bg" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+<StackPane fx:controller="com.demikopi.uiHandler.AdminLoginController" prefHeight="600.0" prefWidth="900.0" styleClass="main-bg" stylesheets="@../admin.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
 
     <VBox alignment="CENTER" maxWidth="400" spacing="25" styleClass="login-card" StackPane.alignment="CENTER">
 
