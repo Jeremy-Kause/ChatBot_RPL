@@ -37,7 +37,7 @@
 
             <VBox HBox.hgrow="ALWAYS">
                 <Label styleClass="assistant-title" text="DemiKopi Coffee Assistant"/>
-                <Label styleClass="assistant-status" text="Online | Siap melayani pesanan Anda"/>
+                <Label fx:id="labelStatus" styleClass="assistant-status" text="Online | Siap melayani pesanan Anda"/>
             </VBox>
 
             <Button onAction="#handleClearChat" styleClass="clear-button" text="Clear Chat"/>
@@ -50,13 +50,26 @@
                 <VBox fx:id="chatStream" spacing="20" styleClass="chat-stream"/>
             </ScrollPane>
 
-            <HBox alignment="CENTER" spacing="12" styleClass="input-bar">
-                <padding>
-                    <Insets bottom="25" left="30" right="30" top="10"/>
-                </padding>
-                <TextField fx:id="inputPesan" onAction="#handleKirimPesan" promptText="Tanya sesuatu tentang kopi kami..." styleClass="text-input" HBox.hgrow="ALWAYS"/>
-                <Button onAction="#handleKirimPesan" prefHeight="45" prefWidth="86" styleClass="send-button" text="Kirim"/>
-            </HBox>
+            <VBox styleClass="composer">
+                <HBox alignment="CENTER_LEFT" spacing="8" styleClass="quick-actions">
+                    <padding>
+                        <Insets bottom="4" left="30" right="30" top="10"/>
+                    </padding>
+                    <Button onAction="#handleTanyaMenu" styleClass="quick-button" text="Menu"/>
+                    <Button onAction="#handleTanyaRekomendasi" styleClass="quick-button" text="Rekomendasi"/>
+                    <Button onAction="#handleTanyaJamBuka" styleClass="quick-button" text="Jam Buka"/>
+                    <Button onAction="#handleTanyaLokasi" styleClass="quick-button" text="Lokasi"/>
+                    <Button onAction="#handleTanyaFasilitas" styleClass="quick-button" text="Fasilitas"/>
+                </HBox>
+
+                <HBox alignment="CENTER" spacing="12" styleClass="input-bar">
+                    <padding>
+                        <Insets bottom="25" left="30" right="30" top="6"/>
+                    </padding>
+                    <TextField fx:id="inputPesan" onAction="#handleKirimPesan" promptText="Tanya sesuatu tentang kopi kami..." styleClass="text-input" HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="tombolKirim" onAction="#handleKirimPesan" prefHeight="45" prefWidth="86" styleClass="send-button" text="Kirim"/>
+                </HBox>
+            </VBox>
         </VBox>
     </center>
 </BorderPane>
