@@ -60,6 +60,13 @@
     -fx-text-fill: -fx-text-dark;
 }
 
+.bubble-user {
+    -fx-background-color: -fx-primary;
+    -fx-background-radius: 16;
+    -fx-padding: 12 14;
+    -fx-text-fill: white;
+}
+
 .input-bar {
     -fx-background-color: transparent;
 }

@@ -21,5 +21,11 @@ public abstract class DatabaseConfig {
             System.err.println("Gagal koneksi: " + e.getMessage());
         }
     }
+
+    protected void pastikanKoneksiTersedia() {
+        if (conn == null) {
+            throw new IllegalStateException("Database tidak terkoneksi. Pastikan MySQL berjalan dan database demikopi sudah dibuat.");
+        }
+    }
 }
 // Done

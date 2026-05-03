@@ -12,25 +12,27 @@ import java.util.stream.Collectors;
 public class MenuDAO extends DatabaseConfig {
 
     public List<Menu> getAllMenu() {
+        pastikanKoneksiTersedia();
         List<Menu> allMenu = new ArrayList<>();
         String query = "SELECT m.*, k.nama_kategori FROM menu m " +
                 "INNER JOIN kategori k ON m.id_kategori = k.id_kategori";
         try (PreparedStatement myStmt = conn.prepareStatement(query)) {
-            ResultSet myRs = myStmt.executeQuery();
-            while (myRs.next()) {
-                int idMenu = myRs.getInt("id_menu");
-                String kategori = myRs.getString("nama_kategori");
-                String namaMenu = myRs.getString("nama_menu");
-                String profilRasa = myRs.getString("profil_rasa");
-                String suhuSajian = myRs.getString("suhu_sajian");
-                boolean bestSeller = myRs.getBoolean("is_bestseller");
-                int harga = myRs.getInt("harga");
-                String deskripsi = myRs.getString("deskripsi");
-                boolean tersedia = myRs.getBoolean("status_tersedia");
-                allMenu.add(new Menu(idMenu, kategori, namaMenu, profilRasa, suhuSajian, bestSeller, harga, deskripsi, tersedia));
+            try (ResultSet myRs = myStmt.executeQuery()) {
+                while (myRs.next()) {
+                    int idMenu = myRs.getInt("id_menu");
+                    String kategori = myRs.getString("nama_kategori");
+                    String namaMenu = myRs.getString("nama_menu");
+                    String profilRasa = myRs.getString("profil_rasa");
+                    String suhuSajian = myRs.getString("suhu_sajian");
+                    boolean bestSeller = myRs.getBoolean("is_bestseller");
+                    int harga = myRs.getInt("harga");
+                    String deskripsi = myRs.getString("deskripsi");
+                    boolean tersedia = myRs.getBoolean("status_tersedia");
+                    allMenu.add(new Menu(idMenu, kategori, namaMenu, profilRasa, suhuSajian, bestSeller, harga, deskripsi, tersedia));
+                }
             }
         } catch (SQLException e) {
-            System.out.println("getAllMenu error: " + e.getMessage());
+            throw new IllegalStateException("Gagal membaca data menu: " + e.getMessage(), e);
         }
         return allMenu;
     }
@@ -74,6 +76,8 @@ public class MenuDAO extends DatabaseConfig {
     }
 
     public boolean tambahMenu(Menu menu) {
+        pastikanKoneksiTersedia();
+
         String query = "INSERT INTO menu (id_kategori, nama_menu, profil_rasa, suhu_sajian, is_bestseller, harga, deskripsi, status_tersedia) " +
                 "VALUES ((SELECT id_kategori FROM kategori WHERE nama_kategori = ?), ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement myStmt = conn.prepareStatement(query)) {
@@ -87,12 +91,12 @@ public class MenuDAO extends DatabaseConfig {
             myStmt.setBoolean(8, menu.isStatusTersedia());
             return myStmt.executeUpdate() == 1;
         } catch (SQLException e) {
-            System.out.println("tambahMenu error: " + e.getMessage());
+            throw new IllegalStateException("Gagal menambah menu: " + e.getMessage(), e);
         }
-        return false;
     }
 
     public boolean updateMenu(Menu menu) {
+        pastikanKoneksiTersedia();
         String query = "UPDATE menu SET " +
                 "id_kategori = (SELECT id_kategori FROM kategori WHERE nama_kategori = ?), " +
                 "nama_menu = ?, " +
@@ -115,20 +119,19 @@ public class MenuDAO extends DatabaseConfig {
             myStmt.setInt(9, menu.getIdMenu());
             return myStmt.executeUpdate() == 1;
         } catch (SQLException e) {
-            System.out.println("updateMenu error: " + e.getMessage());
+            throw new IllegalStateException("Gagal mengubah menu: " + e.getMessage(), e);
         }
-        return false;
     }
 
     public boolean hapusMenu(int idMenu) {
+        pastikanKoneksiTersedia();
         String query = "DELETE FROM menu WHERE id_menu = ?";
         try (PreparedStatement myStmt = conn.prepareStatement(query)) {
             myStmt.setInt(1, idMenu);
             return myStmt.executeUpdate() == 1;
         } catch (SQLException e) {
-            System.out.println("hapusMenu error: " + e.getMessage());
+            throw new IllegalStateException("Gagal menghapus menu: " + e.getMessage(), e);
         }
-        return false;
     }
 }
 // Done
