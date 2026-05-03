@@ -20,6 +20,12 @@
     -fx-background-radius: 50;
 }
 
+.logo-text {
+    -fx-font-size: 10;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
 .assistant-title {
     -fx-font-weight: bold;
     -fx-font-size: 16;
@@ -35,6 +41,10 @@
     -fx-background-color: transparent;
     -fx-text-fill: #888888;
     -fx-cursor: hand;
+}
+
+.clear-button:hover {
+    -fx-text-fill: -fx-primary;
 }
 
 .chat-scroll {
@@ -67,6 +77,32 @@
     -fx-text-fill: white;
 }
 
+.composer {
+    -fx-background-color: #FAF7F2;
+    -fx-border-color: #EFE6DC;
+    -fx-border-width: 1 0 0 0;
+}
+
+.quick-actions {
+    -fx-background-color: transparent;
+}
+
+.quick-button {
+    -fx-background-color: #F3EBE3;
+    -fx-background-radius: 20;
+    -fx-border-color: #E2D5CA;
+    -fx-border-radius: 20;
+    -fx-padding: 7 12;
+    -fx-text-fill: #6E594D;
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.quick-button:hover {
+    -fx-background-color: #E9DDD2;
+}
+
 .input-bar {
     -fx-background-color: transparent;
 }
@@ -84,4 +120,10 @@
     -fx-text-fill: white;
     -fx-background-radius: 10;
     -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.send-button:disabled {
+    -fx-opacity: 0.55;
+    -fx-cursor: default;
 }

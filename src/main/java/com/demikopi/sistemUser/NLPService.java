@@ -45,14 +45,18 @@ public class NLPService {
             return Intent.TANYA_LOKASI;
         } else if (processedInput.contains("fasilitas") || processedInput.contains("wifi") || processedInput.contains("parkir") || processedInput.contains("colokan") || processedInput.contains("mushola")) {
             return Intent.TANYA_FASILITAS;
-        } else if (processedInput.contains("tentang") || processedInput.contains("detail ") || processedInput.contains("info ") || processedInput.contains("deskripsi")) {
+        } else if (processedInput.contains("tentang") || processedInput.contains("detail ")
+                || processedInput.contains("info ") || processedInput.contains("deskripsi")
+                || processedInput.contains("harga")) {
             return Intent.TANYA_DETAIL_MENU;
         } else if (processedInput.matches(".*\\b(rekomen|rekomendasi|saran|enak|bestseller|best seller|bagus|favorit)\\b.*") ||
                 processedInput.contains("manis") || processedInput.contains("pahit") || processedInput.contains("asam") ||
                 processedInput.contains("dingin") || processedInput.contains("panas") || processedInput.contains("iced") ||
-                processedInput.matches(".*\\b(pengen|mau|pesen|pesan|cari)\\b.*")) {
+                processedInput.matches(".*\\b(pengen|mau|pesen|pesan|cari)\\b.*\\byang\\b.*")) {
             return Intent.TANYA_REKOMENDASI;
-        } else if (processedInput.contains("kopi") || processedInput.contains("makanan") || processedInput.contains("non-kopi") || processedInput.contains("mix")) {
+        } else if (processedInput.contains("non-kopi") || processedInput.contains("non kopi")
+                || processedInput.contains("kopi") || processedInput.contains("makanan")
+                || processedInput.contains("minuman") || processedInput.contains("mix")) {
             return Intent.TANYA_KATEGORI;
         } else if (processedInput.contains("menu") || processedInput.contains("daftar") || processedInput.contains("ada apa aja")) {
             return Intent.TANYA_MENU;
@@ -109,7 +113,11 @@ public class NLPService {
                 return (extractedKategori != null ? extractedKategori : "") + "|" + (extractedKriteria != null ? extractedKriteria : "");
 
             case TANYA_KATEGORI:
-                String[] kategori = {"non-kopi", "kopi", "makanan", "mix"};
+                if (processedInput.contains("non-kopi") || processedInput.contains("non kopi")) {
+                    return "non-kopi";
+                }
+
+                String[] kategori = {"kopi", "makanan", "minuman", "mix"};
                 for (String k : kategori) {
                     if (processedInput.contains(k)) {
                         return k;
@@ -119,7 +127,7 @@ public class NLPService {
 
             case TANYA_DETAIL_MENU:
                 String entity = processedInput;
-                String[] triggers = {"tentang ", "detail ", "info ", "deskripsi "};
+                String[] triggers = {"tentang ", "detail ", "info ", "deskripsi ", "harga "};
 
                 for (String t : triggers) {
                     if (entity.contains(t)) {
