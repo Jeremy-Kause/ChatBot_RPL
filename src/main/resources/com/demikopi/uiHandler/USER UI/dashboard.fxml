@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="600.0" prefWidth="800.0" styleClass="main-bg" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane prefHeight="600.0" prefWidth="800.0" styleClass="main-bg" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
 
     <!-- HEADER (Logo & Info Bot Pindah Ke Sini) -->
     <top>
@@ -18,7 +18,6 @@
 
             <VBox HBox.hgrow="ALWAYS">
                 <Label style="-fx-font-weight: bold; -fx-font-size: 16;" text="DemiKopi Coffee Assistant" />
-                <Label style="-fx-text-fill: #2ecc71; -fx-font-size: 11;" text="● Online | Siap melayani pesanan Anda" />
             </VBox>
 
             <!-- Tombol Opsional: Bersihkan Chat (Daripada New Chat) -->
@@ -35,7 +34,7 @@
 
                     <!-- Pesan Bot -->
                     <HBox alignment="BOTTOM_LEFT" spacing="10">
-                        <Region minHeight="30" minWidth="30" styleClass="logo-circle" prefWidth="30" prefHeight="30" />
+                        <Region minHeight="30" minWidth="30" prefHeight="30" prefWidth="30" styleClass="logo-circle" />
                         <Label maxWidth="450" styleClass="bubble-bot" text="Halo! Saya bot DemiKopi. Mau cari kopi yang manis, strong, atau mau lihat menu hari ini?" wrapText="true" />
                     </HBox>
                 </VBox>

@@ -12,12 +12,9 @@ public class FasilitasDAO extends DatabaseConfig {
 
     public List<Fasilitas> getAllFasilitas() {
         List<Fasilitas> fasilitasList = new ArrayList<>();
-
         String query = "SELECT id_fasilitas, nama_fasilitas, deskripsi_fasilitas FROM fasilitas";
-
         try (PreparedStatement myStmt = conn.prepareStatement(query);
                 ResultSet myRs = myStmt.executeQuery()) {
-
             while (myRs.next()) {
                 String idFasilitas = myRs.getString("id_fasilitas");
                 String namaFasilitas = myRs.getString("nama_fasilitas");
@@ -29,7 +26,6 @@ public class FasilitasDAO extends DatabaseConfig {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-
         return fasilitasList;
     }
 
@@ -48,7 +44,6 @@ public class FasilitasDAO extends DatabaseConfig {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-
         return null;
     }
 

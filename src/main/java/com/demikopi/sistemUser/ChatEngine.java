@@ -12,10 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * ChatEngine menjadi pusat routing percakapan chatbot DEMIKOPI.
- * Input user diproses oleh NLPService, lalu diarahkan ke builder respons sesuai intent.
- */
 public class ChatEngine {
 
     private MenuDAO menuDAO;
@@ -70,10 +66,8 @@ public class ChatEngine {
         if (menus == null || menus.isEmpty()) {
             return "Maaf, belum ada menu yang tersedia saat ini.";
         }
-
         Map<String, List<Menu>> grouped = menus.stream()
                 .collect(Collectors.groupingBy(Menu::getKategori));
-
         StringBuilder sb = new StringBuilder();
         sb.append("Berikut menu-menu kami:\n\n");
         for (Map.Entry<String, List<Menu>> set : grouped.entrySet()) {
@@ -93,12 +87,10 @@ public class ChatEngine {
         if (kategori == null || kategori.isEmpty()) {
             return "Bisa tolong perjelas kategori apa yang kamu maksud? (contoh: kopi, makanan)";
         }
-
         List<Menu> menus = menuDAO.getMenuByKategori(kategori);
         if (menus == null || menus.isEmpty()) {
             return "Maaf, kategori " + kategori + " tidak kami temukan atau sedang kosong saat ini.";
         }
-
         StringBuilder sb = new StringBuilder();
         sb.append("Berikut menu kategori ").append(kategori).append(" kami:\n\n");
         int count = 1;
@@ -114,12 +106,10 @@ public class ChatEngine {
         if (namaMenu == null || namaMenu.isEmpty()) {
             return "Bisa tolong sebutkan nama spesifik menunya yang ingin kamu ketahui?";
         }
-
         Menu menu = menuDAO.getMenuByName(namaMenu);
         if (menu == null) {
             return "Maaf, menu '" + namaMenu + "' tidak kami temukan. Coba nama lain.";
         }
-
         return "Detail Menu: " + menu.getNamaMenu() + "\n" +
                "Kategori: " + menu.getKategori() + "\n" +
                "Rasa: " + menu.getProfilRasa() + "\n" +
@@ -152,7 +142,6 @@ public class ChatEngine {
         if (fasilitas == null || fasilitas.isEmpty()) {
             return "Maaf, daftar fasilitas kedai belum diperbarui.";
         }
-
         StringBuilder sb = new StringBuilder();
         sb.append("Fasilitas di DEMIKOPI:\n\n");
         int count = 1;
