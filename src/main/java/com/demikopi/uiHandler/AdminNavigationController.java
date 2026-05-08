@@ -21,6 +21,7 @@ public class AdminNavigationController {
     private static final String PAGE_LOGIN = "login.fxml";
     private static final String PAGE_DASHBOARD = "admin-dashboard.fxml";
     private static final String PAGE_MENU = "menu-management.fxml";
+    private static final String PAGE_FASILITAS = "facility-management.fxml";
     private static final String PAGE_SETTINGS = "settings-view.fxml";
     private static final double DEFAULT_WIDTH = 1200;
     private static final double DEFAULT_HEIGHT = 720;
@@ -38,6 +39,11 @@ public class AdminNavigationController {
     @FXML
     public void showMenu(ActionEvent event) {
         openPage(PAGE_MENU);
+    }
+
+    @FXML
+    public void showFasilitas(ActionEvent event) {
+        openPage(PAGE_FASILITAS);
     }
 
     @FXML

@@ -37,6 +37,7 @@
             <VBox spacing="4.0">
                 <Button maxWidth="Infinity" onAction="#showDashboard" styleClass="nav-item nav-active" text="Dashboard" />
                 <Button maxWidth="Infinity" onAction="#showMenu" styleClass="nav-item" text="Manajemen Menu" />
+                <Button maxWidth="Infinity" onAction="#showFasilitas" styleClass="nav-item" text="Manajemen Fasilitas" />
             </VBox>
 
             <Region prefHeight="16.0" />
@@ -61,9 +62,11 @@
             <HBox alignment="CENTER_LEFT" spacing="12.0">
                 <VBox spacing="3.0">
                     <Label styleClass="page-title" text="Dashboard" />
-                    <Label styleClass="page-subtitle" text="Ringkasan modul admin chatbot" />
+                    <Label styleClass="page-subtitle" text="Ringkasan data admin chatbot DemiKopi" />
                 </VBox>
                 <Region HBox.hgrow="ALWAYS" />
+                <Button onAction="#handleRefreshDashboard" styleClass="soft-button" text="Refresh" />
+                <Label fx:id="lblTanggal" styleClass="date-label" text="-" />
             </HBox>
 
             <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="content-scroll" VBox.vgrow="ALWAYS">
@@ -78,27 +81,27 @@
                             </columnConstraints>
 
                             <VBox spacing="6.0" styleClass="stat-card" GridPane.columnIndex="0">
-                                <Label styleClass="stat-label" text="Status Chatbot" />
-                                <Label styleClass="stat-value-sm" text="Aktif" />
-                                <Label styleClass="stat-change-up" text="Siap melayani" />
+                                <Label styleClass="stat-label" text="Total Menu" />
+                                <Label fx:id="totalMenuLabel" styleClass="stat-value" text="--" />
+                                <Label styleClass="stat-change-neutral" text="Semua data menu" />
                             </VBox>
 
                             <VBox spacing="6.0" styleClass="stat-card" GridPane.columnIndex="1">
-                                <Label styleClass="stat-label" text="Pesanan Masuk" />
-                                <Label styleClass="stat-value" text="--" />
-                                <Label styleClass="stat-change-up" text="Ringkasan" />
+                                <Label styleClass="stat-label" text="Menu Tersedia" />
+                                <Label fx:id="menuTersediaLabel" styleClass="stat-value" text="--" />
+                                <Label styleClass="stat-change-up" text="Ditampilkan ke user" />
                             </VBox>
 
                             <VBox spacing="6.0" styleClass="stat-card" GridPane.columnIndex="2">
-                                <Label styleClass="stat-label" text="Mode Pengguna" />
-                                <Label styleClass="stat-value-sm" text="Tanpa Login" />
-                                <Label styleClass="stat-change-neutral" text="Chat langsung" />
+                                <Label styleClass="stat-label" text="Bestseller" />
+                                <Label fx:id="bestsellerLabel" styleClass="stat-value" text="--" />
+                                <Label styleClass="stat-change-neutral" text="Prioritas rekomendasi" />
                             </VBox>
 
                             <VBox spacing="6.0" styleClass="stat-card" GridPane.columnIndex="3">
-                                <Label styleClass="stat-label" text="Menu Populer" />
-                                <Label styleClass="stat-value-sm" text="--" />
-                                <Label styleClass="stat-change-up" text="Ringkasan" />
+                                <Label styleClass="stat-label" text="Fasilitas" />
+                                <Label fx:id="fasilitasLabel" styleClass="stat-value" text="--" />
+                                <Label styleClass="stat-change-neutral" text="Data fasilitas kedai" />
                             </VBox>
                         </GridPane>
 
@@ -106,64 +109,47 @@
                             <VBox spacing="12.0" styleClass="table-section" HBox.hgrow="ALWAYS">
                                 <HBox alignment="CENTER_LEFT">
                                     <VBox spacing="4.0">
-                                        <Label styleClass="section-title" text="Laporan Operasional" />
-                                        <Label styleClass="card-subtitle" text="Area laporan utama" />
+                                        <Label styleClass="section-title" text="Ringkasan Operasional" />
+                                        <Label styleClass="card-subtitle" text="Status data yang dipakai chatbot" />
                                     </VBox>
                                     <Region HBox.hgrow="ALWAYS" />
-                                    <Label styleClass="chip chip-highlight" text="Laporan" />
+                                    <Label fx:id="databaseStatusLabel" styleClass="chip chip-highlight" text="-" />
                                 </HBox>
 
                                 <HBox styleClass="list-header">
                                     <Label styleClass="list-header-label flex-label" text="Bagian" />
                                     <Label styleClass="list-header-label list-wide" text="Keterangan" />
                                     <Label styleClass="list-header-label" text="Status" />
-                                    <Label styleClass="list-header-label" text="Update" />
                                 </HBox>
 
-                                <HBox styleClass="list-row">
-                                    <Label styleClass="row-title flex-label" text="Bagian 1" />
-                                    <Label styleClass="row-text list-wide" text="Keterangan item laporan" />
-                                    <Label styleClass="row-pill pill-green" text="Status" />
-                                </HBox>
-
-                                <HBox styleClass="list-row">
-                                    <Label styleClass="row-title flex-label" text="Bagian 2" />
-                                    <Label styleClass="row-text list-wide" text="Keterangan item laporan" />
-                                    <Label styleClass="row-pill pill-orange" text="Status" />
-                                </HBox>
-
-                                <HBox styleClass="list-row">
-                                    <Label styleClass="row-title flex-label" text="Bagian 3" />
-                                    <Label styleClass="row-text list-wide" text="Keterangan item laporan" />
-                                    <Label styleClass="row-pill pill-brown" text="Status" />
-                                </HBox>
-
-                                <HBox styleClass="list-row">
-                                    <Label styleClass="row-title flex-label" text="Bagian 4" />
-                                    <Label styleClass="row-text list-wide" text="Keterangan item laporan" />
-                                    <Label styleClass="row-pill pill-neutral" text="Status" />
-                                </HBox>
+                                <VBox fx:id="ringkasanOperasionalList" spacing="0.0" />
                             </VBox>
 
                             <VBox prefWidth="290.0" spacing="12.0" styleClass="side-panel">
-                                <Label styleClass="section-title" text="Panel Samping" />
+                                <Label styleClass="section-title" text="Sorotan" />
 
                                 <VBox spacing="10.0" styleClass="mini-card">
-                                    <Label styleClass="mini-card-title" text="Performa Bot" />
-                                    <Label styleClass="mini-card-value" text="--" />
-                                    <Label styleClass="card-subtitle" text="Keterangan ringkas" />
+                                    <Label styleClass="mini-card-title" text="Top Menu" />
+                                    <Label fx:id="topMenuLabel" styleClass="mini-card-value" text="--" wrapText="true" />
+                                    <Label styleClass="card-subtitle" text="Bestseller tersedia pertama" />
                                 </VBox>
 
                                 <VBox spacing="10.0" styleClass="mini-card">
                                     <Label styleClass="mini-card-title" text="Top Kategori" />
-                                    <Label styleClass="mini-card-value" text="--" />
-                                    <Label styleClass="card-subtitle" text="Keterangan ringkas" />
+                                    <Label fx:id="topKategoriLabel" styleClass="mini-card-value" text="--" wrapText="true" />
+                                    <Label styleClass="card-subtitle" text="Kategori dengan item terbanyak" />
+                                </VBox>
+
+                                <VBox spacing="10.0" styleClass="mini-card">
+                                    <Label styleClass="mini-card-title" text="Info Kedai" />
+                                    <Label fx:id="infoKedaiStatusLabel" styleClass="mini-card-value" text="--" />
+                                    <Label styleClass="card-subtitle" text="Jam buka, lokasi, dan kontak" />
                                 </VBox>
 
                                 <VBox spacing="10.0" styleClass="mini-card accent-card">
-                                    <Label styleClass="mini-card-title light-text" text="Agenda Hari Ini" />
-                                    <Label styleClass="mini-card-value light-text" text="--" />
-                                    <Label styleClass="card-subtitle light-subtext" text="Catatan tambahan" wrapText="true" />
+                                    <Label styleClass="mini-card-title light-text" text="Agenda Admin" />
+                                    <Label fx:id="agendaLabel" styleClass="mini-card-value light-text" text="--" wrapText="true" />
+                                    <Label styleClass="card-subtitle light-subtext" text="Tindak lanjut data hari ini" wrapText="true" />
                                 </VBox>
                             </VBox>
                         </HBox>

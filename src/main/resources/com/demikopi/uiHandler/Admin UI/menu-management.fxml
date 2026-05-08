@@ -36,6 +36,7 @@
             <VBox spacing="4.0">
                 <Button maxWidth="Infinity" onAction="#showDashboard" styleClass="nav-item" text="Dashboard" />
                 <Button maxWidth="Infinity" onAction="#showMenu" styleClass="nav-item nav-active" text="Manajemen Menu" />
+                <Button maxWidth="Infinity" onAction="#showFasilitas" styleClass="nav-item" text="Manajemen Fasilitas" />
             </VBox>
 
             <Region prefHeight="16.0" />
