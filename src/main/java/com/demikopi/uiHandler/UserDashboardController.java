@@ -1,19 +1,29 @@
 package com.demikopi.uiHandler;
 
 import com.demikopi.sistemUser.ChatEngine;
+import com.demikopi.sistemUser.ChatResponse;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.util.List;
 
 public class UserDashboardController {
 
@@ -68,7 +78,7 @@ public class UserDashboardController {
 
     @FXML
     private void handleTanyaRekomendasi() {
-        kirimPesan("Rekomendasi menu bestseller");
+        kirimPesan("Tampilkan rekomendasi best seller");
     }
 
     @FXML
@@ -97,7 +107,7 @@ public class UserDashboardController {
         tambahBubbleUser(pesanUser);
 
         try {
-            String jawabanBot = chatEngine.getResponse(pesanUser);
+            ChatResponse jawabanBot = chatEngine.getChatResponse(pesanUser);
             tambahBubbleBot(jawabanBot);
         } catch (RuntimeException e) {
             tambahBubbleBot("Maaf, terjadi kendala saat memproses pesan. Silakan coba lagi sebentar.");
@@ -115,9 +125,13 @@ public class UserDashboardController {
     }
 
     private void tambahBubbleBot(String pesan) {
+        tambahBubbleBot(ChatResponse.text(pesan));
+    }
+
+    private void tambahBubbleBot(ChatResponse response) {
         StackPane avatarBot = buatAvatarBot();
 
-        Label bubble = buatLabelBubble(pesan, "bubble-bot");
+        Node bubble = buatBubbleBot(response);
 
         HBox barisChat = new HBox(10, avatarBot, bubble);
         barisChat.setAlignment(Pos.BOTTOM_LEFT);
@@ -148,6 +162,185 @@ public class UserDashboardController {
 
         avatar.getChildren().add(logo);
         return avatar;
+    }
+
+    private VBox buatBubbleBot(ChatResponse response) {
+        VBox bubble = new VBox(10);
+        bubble.maxWidthProperty().bind(chatScroll.widthProperty().multiply(0.72));
+        bubble.getStyleClass().add("bubble-bot");
+
+        Label text = new Label(response.getText());
+        text.setWrapText(true);
+        text.setTextOverrun(OverrunStyle.CLIP);
+        text.setMinHeight(Region.USE_PREF_SIZE);
+        text.prefWidthProperty().bind(chatScroll.widthProperty().multiply(0.66));
+        text.maxWidthProperty().bind(chatScroll.widthProperty().multiply(0.66));
+        text.getStyleClass().add("bubble-bot-text");
+        bubble.getChildren().add(text);
+
+        Node gambar = buatAreaGambar(response);
+        if (gambar != null) {
+            bubble.getChildren().add(gambar);
+        }
+
+        return bubble;
+    }
+
+    private Node buatAreaGambar(ChatResponse response) {
+        if (!response.hasImage()) {
+            return null;
+        }
+
+        List<ChatResponse.ChatImage> images = response.getImages();
+        if (images.size() == 1 && images.get(0).getTitle().isBlank()) {
+            return buatGambarMenu(images.get(0).getImagePath());
+        }
+
+        FlowPane galeri = new FlowPane(10, 10);
+        galeri.setPrefWrapLength(500);
+        galeri.getStyleClass().add("recommendation-gallery");
+
+        for (ChatResponse.ChatImage image : images) {
+            Node kartu = buatKartuRekomendasi(image);
+            if (kartu != null) {
+                galeri.getChildren().add(kartu);
+            }
+        }
+
+        return galeri.getChildren().isEmpty() ? null : galeri;
+    }
+
+    private Node buatGambarMenu(String imagePath) {
+        String imageSource = resolveSumberGambar(imagePath);
+        if (imageSource == null) {
+            return null;
+        }
+
+        ImageView imageView = new ImageView(new Image(imageSource));
+        imageView.setFitWidth(220);
+        imageView.setFitHeight(150);
+        imageView.setPreserveRatio(true);
+        imageView.setSmooth(true);
+
+        StackPane frame = new StackPane(imageView);
+        frame.setMinSize(230, 150);
+        frame.setPrefSize(230, 150);
+        frame.setMaxWidth(230);
+        frame.getStyleClass().add("menu-image-frame");
+        return frame;
+    }
+
+    private Node buatKartuRekomendasi(ChatResponse.ChatImage chatImage) {
+        if (chatImage == null) {
+            return null;
+        }
+
+        String imageSource = resolveSumberGambar(chatImage.getImagePath());
+        if (imageSource == null) {
+            return null;
+        }
+
+        ImageView imageView = new ImageView(new Image(imageSource));
+        imageView.setFitWidth(132);
+        imageView.setFitHeight(86);
+        imageView.setPreserveRatio(true);
+        imageView.setSmooth(true);
+
+        StackPane imageFrame = new StackPane(imageView);
+        imageFrame.setMinSize(140, 92);
+        imageFrame.setPrefSize(140, 92);
+        imageFrame.setMaxSize(140, 92);
+        imageFrame.getStyleClass().add("recommendation-image-frame");
+
+        Label title = new Label(chatImage.getTitle());
+        title.setWrapText(true);
+        title.setTextOverrun(OverrunStyle.CLIP);
+        title.setMinHeight(Region.USE_PREF_SIZE);
+        title.setMaxWidth(140);
+        title.getStyleClass().add("recommendation-title");
+
+        Label subtitle = new Label(chatImage.getSubtitle());
+        subtitle.setWrapText(true);
+        subtitle.setMaxWidth(140);
+        subtitle.getStyleClass().add("recommendation-subtitle");
+
+        VBox card = new VBox(6, imageFrame, title, subtitle);
+        card.setPrefWidth(156);
+        card.setMaxWidth(156);
+        card.getStyleClass().add("recommendation-card");
+        return card;
+    }
+
+    private String resolveSumberGambar(String imagePath) {
+        if (imagePath == null || imagePath.isBlank()) {
+            return null;
+        }
+
+        for (String candidate : buildKandidatGambar(imagePath.trim())) {
+            if (isUrlGambar(candidate)) {
+                return candidate;
+            }
+
+            String resourcePath = normalisasiResourcePath(candidate);
+            if (resourcePath != null && getClass().getResource(resourcePath) != null) {
+                return getClass().getResource(resourcePath).toExternalForm();
+            }
+
+            String filePath = resolveFilePath(candidate);
+            if (filePath != null) {
+                return filePath;
+            }
+        }
+
+        return getClass().getResource(LOGO_PATH) == null
+                ? null
+                : getClass().getResource(LOGO_PATH).toExternalForm();
+    }
+
+    private String[] buildKandidatGambar(String imagePath) {
+        if (imagePath.endsWith(".png")) {
+            String basePath = imagePath.substring(0, imagePath.length() - 4);
+            return new String[]{imagePath, basePath + ".jpg", basePath + ".jpeg"};
+        }
+        return new String[]{imagePath};
+    }
+
+    private String normalisasiResourcePath(String imagePath) {
+        if (imagePath.contains("\\") || isUrlGambar(imagePath)) {
+            return null;
+        }
+        if (imagePath.startsWith("/")) {
+            return imagePath;
+        }
+        if (imagePath.startsWith("com/")) {
+            return "/" + imagePath;
+        }
+        if (imagePath.startsWith("asset/")) {
+            return "/com/demikopi/uiHandler/" + imagePath;
+        }
+        return imagePath;
+    }
+
+    private boolean isUrlGambar(String imagePath) {
+        return imagePath.startsWith("http://")
+                || imagePath.startsWith("https://")
+                || imagePath.startsWith("file:");
+    }
+
+    private String resolveFilePath(String imagePath) {
+        try {
+            Path path = Path.of(imagePath);
+            if (!path.isAbsolute()) {
+                path = Path.of("").toAbsolutePath().resolve(path);
+            }
+
+            if (Files.isRegularFile(path)) {
+                return path.toUri().toString();
+            }
+        } catch (InvalidPathException e) {
+            return null;
+        }
+        return null;
     }
 
     private Label buatLabelBubble(String pesan, String styleClass) {

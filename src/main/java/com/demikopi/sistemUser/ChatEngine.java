@@ -36,8 +36,12 @@ public class ChatEngine {
     }
 
     public String getResponse(String inputUser) {
+        return getChatResponse(inputUser).getText();
+    }
+
+    public ChatResponse getChatResponse(String inputUser) {
         if (inputUser == null || inputUser.trim().isEmpty()) {
-            return buildResponseFallback();
+            return ChatResponse.text(buildResponseFallback());
         }
 
         NLPService nlp = new NLPService(inputUser);
@@ -45,30 +49,33 @@ public class ChatEngine {
 
         Menu menuLangsung = cariMenuLangsungJikaPerlu(inputUser, intent);
         if (menuLangsung != null) {
-            return buildResponseDetailMenu(menuLangsung);
+            return buildResponseDetailMenuDenganGambar(menuLangsung);
         }
 
         String keyword = nlp.extractKeyword(intent);
 
         switch (intent) {
             case SALAM:
-                return buildResponseSalam();
+                return ChatResponse.text(buildResponseSalam());
             case TANYA_MENU:
-                return buildResponseSemuaMenu();
+                return ChatResponse.text(buildResponseSemuaMenu());
             case TANYA_KATEGORI:
-                return buildResponseMenuKategori(keyword);
+                return ChatResponse.text(buildResponseMenuKategori(keyword));
             case TANYA_REKOMENDASI:
-                return rekomendasi.getRekomendasi(keyword, ambilMenuTersedia());
+                return buildResponseRekomendasi(keyword);
             case TANYA_DETAIL_MENU:
-                return buildResponseDetailMenu(keyword);
+                if (isKeywordKategori(keyword)) {
+                    return ChatResponse.text(buildResponseMenuKategori(normalisasiKeywordKategori(keyword)));
+                }
+                return buildResponseDetailMenuDenganGambar(keyword);
             case TANYA_JAM_BUKA:
-                return buildResponseJamBuka();
+                return ChatResponse.text(buildResponseJamBuka());
             case TANYA_LOKASI:
-                return buildResponseLokasi();
+                return ChatResponse.text(buildResponseLokasi());
             case TANYA_FASILITAS:
-                return buildResponseFasilitas();
+                return ChatResponse.text(buildResponseFasilitas());
             default:
-                return buildResponseFallback();
+                return ChatResponse.text(buildResponseFallback());
         }
     }
 
@@ -132,6 +139,23 @@ public class ChatEngine {
         return sb.toString().trim();
     }
 
+    private ChatResponse buildResponseRekomendasi(String keyword) {
+        List<Menu> menuTersedia = ambilMenuTersedia();
+        String teks = rekomendasi.getRekomendasi(keyword, menuTersedia, 3);
+        List<ChatResponse.ChatImage> gambarRekomendasi = rekomendasi.getMenuRekomendasi(keyword, menuTersedia, 3).stream()
+                .map(menu -> new ChatResponse.ChatImage(
+                        menu.getNamaMenu(),
+                        formatRupiah(menu.getHarga()),
+                        buildPathGambarMenu(menu)
+                ))
+                .collect(Collectors.toList());
+
+        if (gambarRekomendasi.isEmpty()) {
+            return ChatResponse.text(teks);
+        }
+        return ChatResponse.withImages(teks, gambarRekomendasi);
+    }
+
     private String buildResponseDetailMenu(String namaMenu) {
         if (namaMenu == null || namaMenu.isEmpty()) {
             return "Bisa tolong sebutkan nama spesifik menunya yang ingin kamu ketahui?";
@@ -143,6 +167,23 @@ public class ChatEngine {
         }
 
         return buildResponseDetailMenu(menu);
+    }
+
+    private ChatResponse buildResponseDetailMenuDenganGambar(String namaMenu) {
+        if (namaMenu == null || namaMenu.isEmpty()) {
+            return ChatResponse.text("Bisa tolong sebutkan nama spesifik menunya yang ingin kamu ketahui?");
+        }
+
+        Menu menu = cariMenuByNama(namaMenu);
+        if (menu == null) {
+            return ChatResponse.text("Maaf, menu '" + namaMenu + "' tidak kami temukan. Coba nama lain.");
+        }
+
+        return buildResponseDetailMenuDenganGambar(menu);
+    }
+
+    private ChatResponse buildResponseDetailMenuDenganGambar(Menu menu) {
+        return ChatResponse.withImage(buildResponseDetailMenu(menu), buildPathGambarMenu(menu));
     }
 
     private String buildResponseDetailMenu(Menu menu) {
@@ -233,8 +274,7 @@ public class ChatEngine {
         }
 
         for (Menu menu : ambilMenuTersedia()) {
-            String namaMenu = normalisasi(menu.getNamaMenu());
-            if (!namaMenu.isEmpty() && (teks.equals(namaMenu) || teks.contains(namaMenu))) {
+            if (cocokNamaMenuDalamInput(teks, menu.getNamaMenu())) {
                 return menu;
             }
         }
@@ -270,7 +310,104 @@ public class ChatEngine {
                 return menu;
             }
         }
+
+        for (Menu menu : ambilMenuTersedia()) {
+            if (cocokNamaMenuDalamInput(target, menu.getNamaMenu())) {
+                return menu;
+            }
+        }
         return null;
+    }
+
+    private boolean cocokNamaMenuDalamInput(String teks, String namaMenu) {
+        String nama = normalisasi(namaMenu);
+        if (nama.isEmpty()) {
+            return false;
+        }
+
+        if (teks.equals(nama) || teks.contains(nama)) {
+            return true;
+        }
+
+        List<String> tokenInput = tokenSignifikan(teks);
+        List<String> tokenNama = tokenSignifikan(nama);
+        if (tokenInput.isEmpty() || tokenNama.isEmpty()) {
+            return false;
+        }
+
+        for (String token : tokenNama) {
+            boolean adaYangCocok = tokenInput.stream()
+                    .anyMatch(inputToken -> tokenCocok(token, inputToken));
+            if (!adaYangCocok) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private List<String> tokenSignifikan(String teks) {
+        if (teks == null || teks.isBlank()) {
+            return List.of();
+        }
+
+        return List.of(teks.split("\\s+")).stream()
+                .filter(token -> token.length() >= 3)
+                .filter(token -> !isStopwordNamaMenu(token))
+                .collect(Collectors.toList());
+    }
+
+    private boolean isStopwordNamaMenu(String token) {
+        return token.equals("menu")
+                || token.equals("minuman")
+                || token.equals("makanan")
+                || token.equals("kopi")
+                || token.equals("saya")
+                || token.equals("mau")
+                || token.equals("cek")
+                || token.equals("lihat")
+                || token.equals("cari")
+                || token.equals("info")
+                || token.equals("detail");
+    }
+
+    private boolean tokenCocok(String tokenMenu, String tokenInput) {
+        if (tokenMenu.equals(tokenInput)) {
+            return true;
+        }
+
+        if (tokenMenu.length() < 5 || tokenInput.length() < 5) {
+            return false;
+        }
+
+        int batasJarak = tokenMenu.length() >= 8 || tokenInput.length() >= 8 ? 2 : 1;
+        if (Math.abs(tokenMenu.length() - tokenInput.length()) > batasJarak) {
+            return false;
+        }
+
+        return hitungJarakEdit(tokenMenu, tokenInput) <= batasJarak;
+    }
+
+    private int hitungJarakEdit(String kiri, String kanan) {
+        int[][] jarak = new int[kiri.length() + 1][kanan.length() + 1];
+
+        for (int i = 0; i <= kiri.length(); i++) {
+            jarak[i][0] = i;
+        }
+        for (int j = 0; j <= kanan.length(); j++) {
+            jarak[0][j] = j;
+        }
+
+        for (int i = 1; i <= kiri.length(); i++) {
+            for (int j = 1; j <= kanan.length(); j++) {
+                int biayaGanti = kiri.charAt(i - 1) == kanan.charAt(j - 1) ? 0 : 1;
+                jarak[i][j] = Math.min(
+                        Math.min(jarak[i - 1][j] + 1, jarak[i][j - 1] + 1),
+                        jarak[i - 1][j - 1] + biayaGanti
+                );
+            }
+        }
+
+        return jarak[kiri.length()][kanan.length()];
     }
 
     private String normalisasi(String teks) {
@@ -287,6 +424,17 @@ public class ChatEngine {
         return "Rp " + formatAngka.format(harga);
     }
 
+    private String buildPathGambarMenu(Menu menu) {
+        if (menu.getImagePath() != null && !menu.getImagePath().isBlank()) {
+            return menu.getImagePath();
+        }
+        return "/com/demikopi/uiHandler/asset/menu/" + buatSlugMenu(menu.getNamaMenu()) + ".png";
+    }
+
+    private String buatSlugMenu(String namaMenu) {
+        return normalisasi(namaMenu).replace(" ", "-");
+    }
+
     private boolean cocokKategori(String kategoriMenu, String kategoriDicari) {
         if (kategoriMenu == null || kategoriDicari == null) {
             return false;
@@ -298,6 +446,24 @@ public class ChatEngine {
             return kategori.equals("kopi") || kategori.equals("non-kopi") || kategori.equals("mix");
         }
         return kategori.equals(dicari);
+    }
+
+    private boolean isKeywordKategori(String keyword) {
+        return normalisasiKeywordKategori(keyword) != null;
+    }
+
+    private String normalisasiKeywordKategori(String keyword) {
+        String value = normalisasi(keyword);
+        if (value.equals("non kopi") || value.equals("non-kopi")) {
+            return "non-kopi";
+        }
+        if (value.equals("kopi")
+                || value.equals("makanan")
+                || value.equals("minuman")
+                || value.equals("mix")) {
+            return value;
+        }
+        return null;
     }
 
     private String isiAtauStrip(String value) {

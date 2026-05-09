@@ -16,6 +16,7 @@ public class RecomendationHandler {
 
     private static final String[] KATA_KUNCI_RASA = {"manis", "pahit", "asam", "gurih", "creamy", "fruity"};
     private static final String[] KATA_KUNCI_SUHU = {"panas", "dingin", "iced", "hot"};
+    private static final String[] KATA_KUNCI_BESTSELLER = {"bestseller", "best seller", "best-seller", "terlaris", "paling laku", "favorit", "unggulan"};
 
     private final NumberFormat formatAngka = NumberFormat.getNumberInstance(new Locale("id", "ID"));
 
@@ -24,6 +25,25 @@ public class RecomendationHandler {
     }
 
     public String getRekomendasi(String keyword, List<Menu> daftarMenu) {
+        RekomendasiContext context = parseContext(keyword);
+        return getRekomendasiFiltered(context.kategori, context.kriteria, daftarMenu, 0);
+    }
+
+    public String getRekomendasi(String keyword, List<Menu> daftarMenu, int limit) {
+        RekomendasiContext context = parseContext(keyword);
+        return getRekomendasiFiltered(context.kategori, context.kriteria, daftarMenu, limit);
+    }
+
+    public List<Menu> getMenuRekomendasi(String keyword, List<Menu> daftarMenu, int limit) {
+        RekomendasiContext context = parseContext(keyword);
+        List<Menu> hasil = getMenuFiltered(context.kategori, context.kriteria, daftarMenu);
+        if (limit <= 0 || hasil.size() <= limit) {
+            return hasil;
+        }
+        return hasil.stream().limit(limit).collect(Collectors.toList());
+    }
+
+    private RekomendasiContext parseContext(String keyword) {
         String ctxKategori = null;
         String ctxKriteria = null;
 
@@ -39,10 +59,60 @@ public class RecomendationHandler {
             ctxKriteria = keyword;
         }
 
-        return getRekomendasiFiltered(ctxKategori, ctxKriteria, daftarMenu);
+        return new RekomendasiContext(ctxKategori, ctxKriteria);
     }
 
-    private String getRekomendasiFiltered(String ctxKategori, String ctxKriteria, List<Menu> daftarMenu) {
+    private String getRekomendasiFiltered(String ctxKategori, String ctxKriteria, List<Menu> daftarMenu, int limit) {
+        List<Menu> sortedList = getMenuFiltered(ctxKategori, ctxKriteria, daftarMenu);
+        if (limit > 0 && sortedList.size() > limit) {
+            sortedList = sortedList.stream().limit(limit).collect(Collectors.toList());
+        }
+
+        if (sortedList.isEmpty()) {
+            return "Maaf, saat ini kami belum punya rekomendasi yang pas untuk pencarianmu.";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        if (ctxKategori == null && (ctxKriteria == null || isKriteriaBestseller(ctxKriteria))) {
+            sb.append(limit > 0 ? "Ini 3 rekomendasi menu best seller di DEMIKOPI:\n\n"
+                    : "Ini rekomendasi menu best seller di DEMIKOPI:\n\n");
+        } else {
+            sb.append("Tentu! Kalau kamu cari ");
+            if (ctxKategori != null) {
+                sb.append(ctxKategori).append(" ");
+            }
+            if (ctxKriteria != null) {
+                sb.append("yang ").append(formatKriteria(ctxKriteria)).append(" ");
+            }
+            sb.append("aku merekomendasikan:\n\n");
+        }
+
+        int nomor = 1;
+        for (Menu menu : sortedList) {
+            sb.append(nomor)
+                    .append(". ")
+                    .append(menu.getNamaMenu())
+                    .append(" (")
+                    .append(menu.getKategori())
+                    .append(") - ")
+                    .append(formatRupiah(menu.getHarga()));
+
+            if (menu.isBestseller()) {
+                sb.append(" [Best Seller]");
+            }
+
+            if (menu.getDeskripsiMenu() != null && !menu.getDeskripsiMenu().isBlank()) {
+                sb.append("\n   > ").append(menu.getDeskripsiMenu());
+            }
+
+            sb.append("\n\n");
+            nomor++;
+        }
+
+        return sb.toString().trim();
+    }
+
+    private List<Menu> getMenuFiltered(String ctxKategori, String ctxKriteria, List<Menu> daftarMenu) {
         List<Menu> sourceList = daftarMenu == null ? List.of() : daftarMenu;
 
         if (ctxKategori != null) {
@@ -54,7 +124,11 @@ public class RecomendationHandler {
 
         if (ctxKriteria != null) {
             String finalCtx = ctxKriteria.toLowerCase(Locale.ROOT);
-            if (Arrays.asList(KATA_KUNCI_SUHU).contains(finalCtx)) {
+            if (isKriteriaBestseller(finalCtx)) {
+                sourceList = sourceList.stream()
+                        .filter(Menu::isBestseller)
+                        .collect(Collectors.toList());
+            } else if (Arrays.asList(KATA_KUNCI_SUHU).contains(finalCtx)) {
                 String targetSuhu = finalCtx.equals("iced") ? "dingin" : finalCtx.equals("hot") ? "panas" : finalCtx;
                 sourceList = sourceList.stream()
                         .filter(menu -> menu.getSuhuSajian() != null
@@ -72,51 +146,9 @@ public class RecomendationHandler {
                     .collect(Collectors.toList());
         }
 
-        if (sourceList.isEmpty()) {
-            return "Maaf, saat ini kami belum punya rekomendasi yang pas untuk pencarianmu.";
-        }
-
-        List<Menu> sortedList = sourceList.stream()
+        return sourceList.stream()
                 .sorted((m1, m2) -> Boolean.compare(m2.isBestseller(), m1.isBestseller()))
                 .collect(Collectors.toList());
-
-        StringBuilder sb = new StringBuilder();
-        if (ctxKategori == null && ctxKriteria == null) {
-            sb.append("Kalau kamu bingung, ini menu bestseller yang paling direkomendasikan di DEMIKOPI:\n\n");
-        } else {
-            sb.append("Tentu! Kalau kamu cari ");
-            if (ctxKategori != null) {
-                sb.append(ctxKategori).append(" ");
-            }
-            if (ctxKriteria != null) {
-                sb.append("yang ").append(ctxKriteria).append(" ");
-            }
-            sb.append("aku merekomendasikan:\n\n");
-        }
-
-        int nomor = 1;
-        for (Menu menu : sortedList) {
-            sb.append(nomor)
-                    .append(". ")
-                    .append(menu.getNamaMenu())
-                    .append(" (")
-                    .append(menu.getKategori())
-                    .append(") - ")
-                    .append(formatRupiah(menu.getHarga()));
-
-            if (menu.isBestseller()) {
-                sb.append(" [Bestseller]");
-            }
-
-            if (menu.getDeskripsiMenu() != null && !menu.getDeskripsiMenu().isBlank()) {
-                sb.append("\n   > ").append(menu.getDeskripsiMenu());
-            }
-
-            sb.append("\n\n");
-            nomor++;
-        }
-
-        return sb.toString().trim();
     }
 
     private boolean matchKategoriContext(String dbKategori, String ctxKategori) {
@@ -142,5 +174,23 @@ public class RecomendationHandler {
 
     private String formatRupiah(int harga) {
         return "Rp " + formatAngka.format(harga);
+    }
+
+    private boolean isKriteriaBestseller(String kriteria) {
+        return kriteria != null && Arrays.asList(KATA_KUNCI_BESTSELLER).contains(kriteria.toLowerCase(Locale.ROOT));
+    }
+
+    private String formatKriteria(String kriteria) {
+        return isKriteriaBestseller(kriteria) ? "best seller" : kriteria;
+    }
+
+    private static class RekomendasiContext {
+        private final String kategori;
+        private final String kriteria;
+
+        private RekomendasiContext(String kategori, String kriteria) {
+            this.kategori = kategori;
+            this.kriteria = kriteria;
+        }
     }
 }

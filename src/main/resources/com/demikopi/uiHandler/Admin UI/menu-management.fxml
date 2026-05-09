@@ -127,7 +127,12 @@
 
                     <VBox spacing="6.0">
                         <Label styleClass="form-label" text="Deskripsi" />
-                        <TextArea fx:id="deskripsiInput" prefRowCount="4" promptText="Deskripsi singkat menu" styleClass="settings-field" wrapText="true" />
+                        <TextArea fx:id="deskripsiInput" prefRowCount="3" promptText="Deskripsi singkat menu" styleClass="settings-field" wrapText="true" />
+                    </VBox>
+
+                    <VBox spacing="6.0">
+                        <Label styleClass="form-label" text="Path Gambar" />
+                        <TextField fx:id="imagePathInput" promptText="asset/menu/caramel-macchiato.jpg" styleClass="settings-field" />
                     </VBox>
 
                     <HBox alignment="CENTER_LEFT" spacing="18.0">

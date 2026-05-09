@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 public class MenuDAO extends DatabaseConfig {
 
+    private Boolean hasImagePathColumn;
+
     public List<Menu> getAllMenu() {
         pastikanKoneksiTersedia();
         List<Menu> allMenu = new ArrayList<>();
@@ -27,8 +29,9 @@ public class MenuDAO extends DatabaseConfig {
                     boolean bestSeller = myRs.getBoolean("is_bestseller");
                     int harga = myRs.getInt("harga");
                     String deskripsi = myRs.getString("deskripsi");
+                    String imagePath = bacaImagePath(myRs);
                     boolean tersedia = myRs.getBoolean("status_tersedia");
-                    allMenu.add(new Menu(idMenu, kategori, namaMenu, profilRasa, suhuSajian, bestSeller, harga, deskripsi, tersedia));
+                    allMenu.add(new Menu(idMenu, kategori, namaMenu, profilRasa, suhuSajian, bestSeller, harga, deskripsi, imagePath, tersedia));
                 }
             }
         } catch (SQLException e) {
@@ -78,6 +81,10 @@ public class MenuDAO extends DatabaseConfig {
     public boolean tambahMenu(Menu menu) {
         pastikanKoneksiTersedia();
 
+        if (punyaKolomImagePath()) {
+            return tambahMenuDenganGambar(menu);
+        }
+
         String query = "INSERT INTO menu (id_kategori, nama_menu, profil_rasa, suhu_sajian, is_bestseller, harga, deskripsi, status_tersedia) " +
                 "VALUES ((SELECT id_kategori FROM kategori WHERE nama_kategori = ?), ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement myStmt = conn.prepareStatement(query)) {
@@ -95,8 +102,31 @@ public class MenuDAO extends DatabaseConfig {
         }
     }
 
+    private boolean tambahMenuDenganGambar(Menu menu) {
+        String query = "INSERT INTO menu (id_kategori, nama_menu, profil_rasa, suhu_sajian, is_bestseller, harga, deskripsi, image_path, status_tersedia) " +
+                "VALUES ((SELECT id_kategori FROM kategori WHERE nama_kategori = ?), ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement myStmt = conn.prepareStatement(query)) {
+            myStmt.setString(1, menu.getKategori());
+            myStmt.setString(2, menu.getNamaMenu());
+            myStmt.setString(3, menu.getProfilRasa());
+            myStmt.setString(4, menu.getSuhuSajian());
+            myStmt.setBoolean(5, menu.isBestseller());
+            myStmt.setInt(6, menu.getHarga());
+            myStmt.setString(7, menu.getDeskripsiMenu());
+            myStmt.setString(8, menu.getImagePath());
+            myStmt.setBoolean(9, menu.isStatusTersedia());
+            return myStmt.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new IllegalStateException("Gagal menambah menu: " + e.getMessage(), e);
+        }
+    }
+
     public boolean updateMenu(Menu menu) {
         pastikanKoneksiTersedia();
+        if (punyaKolomImagePath()) {
+            return updateMenuDenganGambar(menu);
+        }
+
         String query = "UPDATE menu SET " +
                 "id_kategori = (SELECT id_kategori FROM kategori WHERE nama_kategori = ?), " +
                 "nama_menu = ?, " +
@@ -123,6 +153,35 @@ public class MenuDAO extends DatabaseConfig {
         }
     }
 
+    private boolean updateMenuDenganGambar(Menu menu) {
+        String query = "UPDATE menu SET " +
+                "id_kategori = (SELECT id_kategori FROM kategori WHERE nama_kategori = ?), " +
+                "nama_menu = ?, " +
+                "profil_rasa = ?, " +
+                "suhu_sajian = ?, " +
+                "is_bestseller = ?, " +
+                "harga = ?, " +
+                "deskripsi = ?, " +
+                "image_path = ?, " +
+                "status_tersedia = ? " +
+                "WHERE id_menu = ?";
+        try (PreparedStatement myStmt = conn.prepareStatement(query)) {
+            myStmt.setString(1, menu.getKategori());
+            myStmt.setString(2, menu.getNamaMenu());
+            myStmt.setString(3, menu.getProfilRasa());
+            myStmt.setString(4, menu.getSuhuSajian());
+            myStmt.setBoolean(5, menu.isBestseller());
+            myStmt.setInt(6, menu.getHarga());
+            myStmt.setString(7, menu.getDeskripsiMenu());
+            myStmt.setString(8, menu.getImagePath());
+            myStmt.setBoolean(9, menu.isStatusTersedia());
+            myStmt.setInt(10, menu.getIdMenu());
+            return myStmt.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new IllegalStateException("Gagal mengubah menu: " + e.getMessage(), e);
+        }
+    }
+
     public boolean hapusMenu(int idMenu) {
         pastikanKoneksiTersedia();
         String query = "DELETE FROM menu WHERE id_menu = ?";
@@ -131,6 +190,30 @@ public class MenuDAO extends DatabaseConfig {
             return myStmt.executeUpdate() == 1;
         } catch (SQLException e) {
             throw new IllegalStateException("Gagal menghapus menu: " + e.getMessage(), e);
+        }
+    }
+
+    private String bacaImagePath(ResultSet resultSet) throws SQLException {
+        if (!punyaKolomImagePath()) {
+            return null;
+        }
+        return resultSet.getString("image_path");
+    }
+
+    private boolean punyaKolomImagePath() {
+        if (hasImagePathColumn != null) {
+            return hasImagePathColumn;
+        }
+
+        try {
+            String catalog = conn.getCatalog();
+            try (ResultSet rs = conn.getMetaData().getColumns(catalog, null, "menu", "image_path")) {
+                hasImagePathColumn = rs.next();
+                return hasImagePathColumn;
+            }
+        } catch (SQLException e) {
+            hasImagePathColumn = false;
+            return false;
         }
     }
 }
