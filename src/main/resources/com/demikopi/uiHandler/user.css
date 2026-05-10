@@ -70,11 +70,55 @@
     -fx-text-fill: -fx-text-dark;
 }
 
+.bubble-bot-text {
+    -fx-text-fill: -fx-text-dark;
+}
+
 .bubble-user {
     -fx-background-color: -fx-primary;
     -fx-background-radius: 16;
     -fx-padding: 12 14;
     -fx-text-fill: white;
+}
+
+.menu-image-frame {
+    -fx-background-color: #F3EBE3;
+    -fx-background-radius: 12;
+    -fx-border-color: #E2D5CA;
+    -fx-border-radius: 12;
+    -fx-padding: 8;
+}
+
+.recommendation-gallery {
+    -fx-padding: 2 0 0 0;
+}
+
+.recommendation-card {
+    -fx-background-color: #F8F3ED;
+    -fx-background-radius: 12;
+    -fx-border-color: #E2D5CA;
+    -fx-border-radius: 12;
+    -fx-padding: 8;
+}
+
+.recommendation-image-frame {
+    -fx-background-color: white;
+    -fx-background-radius: 9;
+    -fx-border-color: #E6DDD5;
+    -fx-border-radius: 9;
+    -fx-padding: 4;
+}
+
+.recommendation-title {
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-dark;
+}
+
+.recommendation-subtitle {
+    -fx-font-size: 11;
+    -fx-text-fill: -fx-primary;
+    -fx-font-weight: bold;
 }
 
 .composer {

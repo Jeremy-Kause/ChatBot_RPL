@@ -5,12 +5,12 @@ import com.demikopi.model.InfoKedai;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class InfoDAO extends DatabaseConfig {
 
     public InfoKedai getInfo() {
+        pastikanKoneksiTersedia();
+
         String query = "SELECT * FROM infokedai LIMIT 1";
         try (PreparedStatement myStmt = conn.prepareStatement(query)) {
             ResultSet myRs = myStmt.executeQuery();
@@ -22,12 +22,14 @@ public class InfoDAO extends DatabaseConfig {
                 return new InfoKedai(idInfo, jamOperasional, lokasi, kontak);
             }
         } catch (SQLException e) {
-            System.out.println("getAllInfo error: " + e.getMessage());
+            throw new IllegalStateException("Gagal membaca info kedai: " + e.getMessage(), e);
         }
         return null;
     }
 
     public boolean updateInfo(InfoKedai info) {
+        pastikanKoneksiTersedia();
+
         String query = "UPDATE infokedai SET jam_operasional = ?, lokasi = ?, kontak = ? WHERE id_info = ?";
         try (PreparedStatement myStmt = conn.prepareStatement(query)) {
             myStmt.setString(1, info.getJamOperasional());
@@ -36,9 +38,8 @@ public class InfoDAO extends DatabaseConfig {
             myStmt.setString(4, info.getIdInfo());
             return myStmt.executeUpdate() == 1;
         } catch (SQLException e) {
-            System.out.println("updateInfo error: " + e.getMessage());
+            throw new IllegalStateException("Gagal mengubah info kedai: " + e.getMessage(), e);
         }
-        return false;
     }
 }
 // Done

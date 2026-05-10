@@ -6,10 +6,13 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="rootPane" prefHeight="720.0" prefWidth="1200.0" styleClass="main-bg" stylesheets="@../admin.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.demikopi.uiHandler.AdminDashboardController">
+<BorderPane fx:id="rootPane" prefHeight="720.0" prefWidth="1200.0" styleClass="main-bg" stylesheets="@../admin.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.demikopi.uiHandler.AdminSettingsController">
     <left>
         <VBox prefWidth="220.0" styleClass="sidebar">
-            <padding><Insets bottom="24.0" left="16.0" right="16.0" top="24.0" /></padding>
+            <padding>
+                <Insets bottom="24.0" left="16.0" right="16.0" top="24.0" />
+            </padding>
+
             <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="sidebar-logo-box">
                 <StackPane maxHeight="42.0" maxWidth="42.0" prefHeight="42.0" prefWidth="42.0" styleClass="logo-circle">
                     <ImageView fitHeight="28.0" fitWidth="28.0" preserveRatio="true">
@@ -26,69 +29,94 @@
                     <Label styleClass="sidebar-logo-sub" text="Admin Panel" />
                 </VBox>
             </HBox>
+
             <Region prefHeight="24.0" />
+
             <Label styleClass="nav-section-label" text="MENU UTAMA" />
             <VBox spacing="4.0">
                 <Button maxWidth="Infinity" onAction="#showDashboard" styleClass="nav-item" text="Dashboard" />
                 <Button maxWidth="Infinity" onAction="#showMenu" styleClass="nav-item" text="Manajemen Menu" />
+                <Button maxWidth="Infinity" onAction="#showFasilitas" styleClass="nav-item" text="Manajemen Fasilitas" />
             </VBox>
+
             <Region prefHeight="16.0" />
+
             <Label styleClass="nav-section-label" text="SISTEM" />
             <VBox spacing="4.0">
                 <Button maxWidth="Infinity" onAction="#showSettings" styleClass="nav-item nav-active" text="Pengaturan" />
             </VBox>
+
             <Region VBox.vgrow="ALWAYS" />
+
             <Button maxWidth="Infinity" onAction="#handleLogout" styleClass="nav-item nav-logout" text="Keluar" />
         </VBox>
     </left>
+
     <center>
         <VBox spacing="18.0" styleClass="content-area">
-            <padding><Insets bottom="24.0" left="24.0" right="24.0" top="24.0" /></padding>
+            <padding>
+                <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+            </padding>
+
             <HBox alignment="CENTER_LEFT" spacing="12.0">
                 <VBox spacing="3.0">
                     <Label styleClass="page-title" text="Pengaturan" />
-                    <Label styleClass="page-subtitle" text="Atur informasi kedai dan preferensi tampilan admin" />
+                    <Label styleClass="page-subtitle" text="Atur informasi kedai yang dipakai jawaban chatbot" />
                 </VBox>
                 <Region HBox.hgrow="ALWAYS" />
+                <Button onAction="#handleMuatUlangPengaturan" styleClass="soft-button" text="Muat Ulang" />
             </HBox>
+
             <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="content-scroll" VBox.vgrow="ALWAYS">
                 <content>
                     <VBox spacing="18.0" styleClass="page-shell">
-                        <HBox alignment="CENTER_LEFT">
-                            <Label styleClass="chip chip-highlight" text="Pengaturan" />
-                            <Region HBox.hgrow="ALWAYS" />
-                        </HBox>
                         <HBox spacing="18.0">
                             <VBox spacing="16.0" styleClass="table-section" HBox.hgrow="ALWAYS">
-                                <Label styleClass="section-title" text="Informasi Kedai" />
+                                <VBox spacing="4.0">
+                                    <Label styleClass="section-title" text="Informasi Kedai" />
+                                    <Label styleClass="card-subtitle" text="Data ini digunakan untuk jawaban jam buka, lokasi, dan kontak" />
+                                </VBox>
+
                                 <GridPane hgap="14.0" vgap="12.0">
                                     <columnConstraints>
-                                        <ColumnConstraints percentWidth="35.0" />
+                                        <ColumnConstraints percentWidth="32.0" />
                                         <ColumnConstraints hgrow="ALWAYS" />
                                     </columnConstraints>
+
                                     <Label styleClass="form-label" text="Nama Kedai" GridPane.rowIndex="0" />
-                                    <TextField promptText="Isi data" styleClass="settings-field" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                    <TextField fx:id="namaKedaiInput" editable="false" styleClass="settings-field" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
                                     <Label styleClass="form-label" text="Jam Operasional" GridPane.rowIndex="1" />
-                                    <TextField promptText="Isi data" styleClass="settings-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <TextField fx:id="jamOperasionalInput" promptText="Contoh: Senin - Jumat: 08.00 - 22.00" styleClass="settings-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
                                     <Label styleClass="form-label" text="Kontak" GridPane.rowIndex="2" />
-                                    <TextField promptText="Isi data" styleClass="settings-field" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    <TextField fx:id="kontakInput" promptText="Contoh: 0812-3456-7890" styleClass="settings-field" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
                                     <Label styleClass="form-label" text="Lokasi" GridPane.rowIndex="3" />
-                                    <TextField promptText="Isi data" styleClass="settings-field" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                    <TextArea fx:id="lokasiInput" prefRowCount="4" promptText="Alamat lengkap kedai" styleClass="settings-field" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                 </GridPane>
+
                                 <Separator />
-                                <Label styleClass="section-title" text="Preferensi Sistem" />
-                                <CheckBox mnemonicParsing="false" selected="true" styleClass="settings-check" text="Opsi Pengaturan 1" />
-                                <CheckBox mnemonicParsing="false" selected="true" styleClass="settings-check" text="Opsi Pengaturan 2" />
-                                <HBox alignment="CENTER_RIGHT">
-                                    <Label styleClass="primary-button-label" text="Simpan" />
+
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Label fx:id="statusSimpanLabel" styleClass="card-subtitle" text="Memuat data..." />
+                                    <Button onAction="#handleSimpanPengaturan" styleClass="button-primary" text="Simpan Pengaturan" />
                                 </HBox>
                             </VBox>
+
                             <VBox prefWidth="290.0" spacing="12.0" styleClass="side-panel">
                                 <Label styleClass="section-title" text="Status Sistem" />
+
                                 <VBox spacing="10.0" styleClass="mini-card accent-card">
-                                    <Label styleClass="mini-card-title light-text" text="Chatbot Mode" />
-                                    <Label styleClass="mini-card-value light-text" text="Status" />
-                                    <Label styleClass="card-subtitle light-subtext" text="Keterangan status" />
+                                    <Label styleClass="mini-card-title light-text" text="Database" />
+                                    <Label fx:id="databaseStatusLabel" styleClass="mini-card-value light-text" text="-" />
+                                    <Label styleClass="card-subtitle light-subtext" text="Koneksi data admin" />
+                                </VBox>
+
+                                <VBox spacing="10.0" styleClass="mini-card">
+                                    <Label styleClass="mini-card-title" text="Info Kedai" />
+                                    <Label fx:id="infoStatusLabel" styleClass="mini-card-value" text="-" />
+                                    <Label styleClass="card-subtitle" text="Sumber jawaban chatbot" />
                                 </VBox>
                             </VBox>
                         </HBox>

@@ -77,6 +77,9 @@ public class MenuManagementController extends AdminNavigationController {
     private TextArea deskripsiInput;
 
     @FXML
+    private TextField imagePathInput;
+
+    @FXML
     private CheckBox bestsellerCheck;
 
     @FXML
@@ -282,6 +285,7 @@ public class MenuManagementController extends AdminNavigationController {
         suhuSajianInput.setText(aman(menu.getSuhuSajian()));
         hargaInput.setText(String.valueOf(menu.getHarga()));
         deskripsiInput.setText(aman(menu.getDeskripsiMenu()));
+        imagePathInput.setText(aman(menu.getImagePath()));
         bestsellerCheck.setSelected(menu.isBestseller());
         tersediaCheck.setSelected(menu.isStatusTersedia());
     }
@@ -292,6 +296,7 @@ public class MenuManagementController extends AdminNavigationController {
         String profilRasa = ambilText(profilRasaInput);
         String suhuSajian = ambilText(suhuSajianInput);
         String deskripsi = ambilText(deskripsiInput);
+        String imagePath = kosongJadiNull(ambilText(imagePathInput));
 
         if (namaMenu.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Data belum lengkap", "Nama menu wajib diisi.");
@@ -318,6 +323,7 @@ public class MenuManagementController extends AdminNavigationController {
                 bestsellerCheck.isSelected(),
                 harga,
                 deskripsi,
+                imagePath,
                 tersediaCheck.isSelected()
         );
     }
@@ -346,6 +352,7 @@ public class MenuManagementController extends AdminNavigationController {
         suhuSajianInput.clear();
         hargaInput.clear();
         deskripsiInput.clear();
+        imagePathInput.clear();
         bestsellerCheck.setSelected(false);
         tersediaCheck.setSelected(true);
 
@@ -368,6 +375,10 @@ public class MenuManagementController extends AdminNavigationController {
 
     private String aman(String value) {
         return value == null ? "" : value;
+    }
+
+    private String kosongJadiNull(String value) {
+        return value == null || value.isBlank() ? null : value;
     }
 
     private String formatRupiah(int harga) {

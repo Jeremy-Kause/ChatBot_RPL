@@ -6,6 +6,23 @@ package com.demikopi.sistemUser;
  */
 public class NLPService {
 
+    private static final String[] KAMUS_SALAM = {"halo", "hi", "hey", "hai", "pagi", "siang", "sore", "malam"};
+    private static final String[] KAMUS_JAM = {"jam", "buka", "tutup", "operasional"};
+    private static final String[] KAMUS_LOKASI = {"lokasi", "alamat", "di mana", "dimana"};
+    private static final String[] KAMUS_FASILITAS = {"fasilitas", "wifi", "parkir", "colokan", "mushola", "musholla"};
+    private static final String[] KAMUS_DETAIL = {"tentang", "detail", "info", "deskripsi", "harga"};
+    private static final String[] KAMUS_REKOMENDASI = {
+            "rekomen", "rekomendasi", "saran", "enak", "bagus", "favorit",
+            "bestseller", "best seller", "best-seller", "terlaris", "paling laku", "unggulan"
+    };
+    private static final String[] KAMUS_BESTSELLER = {
+            "bestseller", "best seller", "best-seller", "terlaris", "paling laku", "favorit", "unggulan"
+    };
+    private static final String[] KAMUS_RASA = {"manis", "pahit", "asam", "gurih", "creamy", "fruity", "segar"};
+    private static final String[] KAMUS_SUHU = {"panas", "dingin", "iced", "hot"};
+    private static final String[] KAMUS_MENU = {"menu", "daftar", "ada apa aja", "list"};
+    private static final String[] KAMUS_KATEGORI = {"non-kopi", "non kopi", "kopi", "makanan", "minuman", "mix"};
+
     private String inputUser;
     private String processedInput;
 
@@ -37,28 +54,24 @@ public class NLPService {
         if (processedInput == null || processedInput.isEmpty()) {
             return Intent.TIDAK_DIKENAL;
         }
-        if (processedInput.matches(".*\\b(halo|hi|hey|hai|pagi|siang|sore|malam)\\b.*")) {
+        if (containsAnyWord(KAMUS_SALAM)) {
             return Intent.SALAM;
-        } else if (processedInput.contains("jam") || processedInput.contains("buka") || processedInput.contains("tutup") || processedInput.contains("operasional")) {
+        } else if (containsAny(KAMUS_JAM)) {
             return Intent.TANYA_JAM_BUKA;
-        } else if (processedInput.contains("lokasi") || processedInput.contains("alamat") || processedInput.contains("di mana") || processedInput.contains("dimana")) {
+        } else if (containsAny(KAMUS_LOKASI)) {
             return Intent.TANYA_LOKASI;
-        } else if (processedInput.contains("fasilitas") || processedInput.contains("wifi") || processedInput.contains("parkir") || processedInput.contains("colokan") || processedInput.contains("mushola")) {
+        } else if (containsAny(KAMUS_FASILITAS)) {
             return Intent.TANYA_FASILITAS;
-        } else if (processedInput.contains("tentang") || processedInput.contains("detail ")
-                || processedInput.contains("info ") || processedInput.contains("deskripsi")
-                || processedInput.contains("harga")) {
-            return Intent.TANYA_DETAIL_MENU;
-        } else if (processedInput.matches(".*\\b(rekomen|rekomendasi|saran|enak|bestseller|best seller|bagus|favorit)\\b.*") ||
-                processedInput.contains("manis") || processedInput.contains("pahit") || processedInput.contains("asam") ||
-                processedInput.contains("dingin") || processedInput.contains("panas") || processedInput.contains("iced") ||
-                processedInput.matches(".*\\b(pengen|mau|pesen|pesan|cari)\\b.*\\byang\\b.*")) {
+        } else if (containsAny(KAMUS_REKOMENDASI)
+                || containsAny(KAMUS_RASA)
+                || containsAny(KAMUS_SUHU)
+                || processedInput.matches(".*\\b(pengen|mau|pesen|pesan|cari)\\b.*\\byang\\b.*")) {
             return Intent.TANYA_REKOMENDASI;
-        } else if (processedInput.contains("non-kopi") || processedInput.contains("non kopi")
-                || processedInput.contains("kopi") || processedInput.contains("makanan")
-                || processedInput.contains("minuman") || processedInput.contains("mix")) {
+        } else if (containsAny(KAMUS_DETAIL)) {
+            return Intent.TANYA_DETAIL_MENU;
+        } else if (containsAny(KAMUS_KATEGORI)) {
             return Intent.TANYA_KATEGORI;
-        } else if (processedInput.contains("menu") || processedInput.contains("daftar") || processedInput.contains("ada apa aja")) {
+        } else if (containsAny(KAMUS_MENU)) {
             return Intent.TANYA_MENU;
         }
 
@@ -86,20 +99,23 @@ public class NLPService {
                 }
 
                 String extractedKriteria = null;
+                if (containsAny(KAMUS_BESTSELLER)) {
+                    extractedKriteria = "bestseller";
+                }
 
                 // Kriteria rasa.
-                String[] rasa = {"manis", "pahit", "asam", "gurih", "creamy", "fruity"};
-                for (String r : rasa) {
-                    if (processedInput.contains(r)) {
-                        extractedKriteria = r;
-                        break;
+                if (extractedKriteria == null) {
+                    for (String r : KAMUS_RASA) {
+                        if (processedInput.contains(r)) {
+                            extractedKriteria = r;
+                            break;
+                        }
                     }
                 }
 
                 // Kriteria suhu.
                 if (extractedKriteria == null) {
-                    String[] suhu = {"panas", "dingin", "iced", "hot"};
-                    for (String s : suhu) {
+                    for (String s : KAMUS_SUHU) {
                         if (processedInput.contains(s)) {
                             extractedKriteria = s;
                             break;
@@ -148,5 +164,23 @@ public class NLPService {
                 return null;
         }
         return null;
+    }
+
+    private boolean containsAny(String[] kamus) {
+        for (String kata : kamus) {
+            if (processedInput.contains(kata)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean containsAnyWord(String[] kamus) {
+        for (String kata : kamus) {
+            if (processedInput.matches(".*\\b" + kata + "\\b.*")) {
+                return true;
+            }
+        }
+        return false;
     }
 }

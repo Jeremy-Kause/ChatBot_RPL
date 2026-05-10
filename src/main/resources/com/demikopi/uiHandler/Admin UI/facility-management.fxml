@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="rootPane" prefHeight="720.0" prefWidth="1200.0" styleClass="main-bg" stylesheets="@../admin.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.demikopi.uiHandler.FacilityManagementController">
+    <left>
+        <VBox prefWidth="220.0" styleClass="sidebar">
+            <padding>
+                <Insets bottom="24.0" left="16.0" right="16.0" top="24.0" />
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="sidebar-logo-box">
+                <StackPane maxHeight="42.0" maxWidth="42.0" prefHeight="42.0" prefWidth="42.0" styleClass="logo-circle">
+                    <ImageView fitHeight="28.0" fitWidth="28.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../asset/coffee-cup.png" />
+                        </image>
+                        <effect>
+                            <ColorAdjust brightness="1.0" saturation="-1.0" />
+                        </effect>
+                    </ImageView>
+                </StackPane>
+                <VBox spacing="2.0">
+                    <Label styleClass="sidebar-logo" text="DemiKopi" />
+                    <Label styleClass="sidebar-logo-sub" text="Admin Panel" />
+                </VBox>
+            </HBox>
+
+            <Region prefHeight="24.0" />
+
+            <Label styleClass="nav-section-label" text="MENU UTAMA" />
+            <VBox spacing="4.0">
+                <Button maxWidth="Infinity" onAction="#showDashboard" styleClass="nav-item" text="Dashboard" />
+                <Button maxWidth="Infinity" onAction="#showMenu" styleClass="nav-item" text="Manajemen Menu" />
+                <Button maxWidth="Infinity" onAction="#showFasilitas" styleClass="nav-item nav-active" text="Manajemen Fasilitas" />
+            </VBox>
+
+            <Region prefHeight="16.0" />
+
+            <Label styleClass="nav-section-label" text="SISTEM" />
+            <VBox spacing="4.0">
+                <Button maxWidth="Infinity" onAction="#showSettings" styleClass="nav-item" text="Pengaturan" />
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS" />
+
+            <Button maxWidth="Infinity" onAction="#handleLogout" styleClass="nav-item nav-logout" text="Keluar" />
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="18.0" styleClass="content-area">
+            <padding>
+                <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
+                <VBox spacing="3.0">
+                    <Label styleClass="page-title" text="Manajemen Fasilitas" />
+                    <Label styleClass="page-subtitle" text="Tambah, ubah, hapus, dan cari fasilitas kedai" />
+                </VBox>
+                <Region HBox.hgrow="ALWAYS" />
+                <Button onAction="#handleRefreshFasilitas" styleClass="soft-button" text="Refresh" />
+            </HBox>
+
+            <HBox spacing="18.0" VBox.vgrow="ALWAYS">
+                <VBox spacing="12.0" styleClass="table-section" HBox.hgrow="ALWAYS">
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <VBox spacing="4.0">
+                            <Label styleClass="section-title" text="Daftar Fasilitas" />
+                            <Label fx:id="statusFasilitasLabel" styleClass="card-subtitle" text="Menampilkan 0 dari 0 fasilitas" />
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                    </HBox>
+
+                    <TextField fx:id="searchInput" onKeyReleased="#handleCariFasilitas" promptText="Cari id, nama, atau deskripsi fasilitas..." styleClass="search-field" />
+
+                    <TableView fx:id="fasilitasTable" styleClass="menu-table" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="idFasilitasColumn" prefWidth="80.0" text="ID" />
+                            <TableColumn fx:id="namaFasilitasColumn" prefWidth="180.0" text="Nama Fasilitas" />
+                            <TableColumn fx:id="deskripsiFasilitasColumn" prefWidth="420.0" text="Deskripsi" />
+                        </columns>
+                    </TableView>
+                </VBox>
+
+                <VBox prefWidth="340.0" spacing="12.0" styleClass="table-section">
+                    <VBox spacing="4.0">
+                        <Label fx:id="formTitleLabel" styleClass="section-title" text="Tambah Fasilitas" />
+                        <Label styleClass="card-subtitle" text="Pilih baris tabel untuk mengedit fasilitas" />
+                    </VBox>
+
+                    <VBox spacing="6.0">
+                        <Label styleClass="form-label" text="Nama Fasilitas" />
+                        <TextField fx:id="namaFasilitasInput" promptText="Contoh: WiFi Gratis" styleClass="settings-field" />
+                    </VBox>
+
+                    <VBox spacing="6.0">
+                        <Label styleClass="form-label" text="Deskripsi" />
+                        <TextArea fx:id="deskripsiFasilitasInput" prefRowCount="8" promptText="Deskripsi fasilitas yang akan dijawab chatbot" styleClass="settings-field" wrapText="true" />
+                    </VBox>
+
+                    <HBox alignment="CENTER_RIGHT" spacing="8.0">
+                        <Button onAction="#handleBersihkanForm" styleClass="soft-button" text="Bersihkan" />
+                        <Button onAction="#handleHapusFasilitas" styleClass="danger-button" text="Hapus" />
+                        <Button onAction="#handleSimpanFasilitas" styleClass="button-primary" text="Simpan" />
+                    </HBox>
+                </VBox>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>

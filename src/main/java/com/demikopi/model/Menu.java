@@ -10,9 +10,14 @@ public class Menu {
     private boolean isBestseller;
     private int harga;
     private String deskripsiMenu;
+    private String imagePath;
     private boolean statusTersedia;
 
     public Menu(int idMenu, String kategori, String namaMenu, String profilRasa, String suhuSajian, boolean isBestseller, int harga, String deskripsiMenu, boolean statusTersedia) {
+        this(idMenu, kategori, namaMenu, profilRasa, suhuSajian, isBestseller, harga, deskripsiMenu, null, statusTersedia);
+    }
+
+    public Menu(int idMenu, String kategori, String namaMenu, String profilRasa, String suhuSajian, boolean isBestseller, int harga, String deskripsiMenu, String imagePath, boolean statusTersedia) {
         this.idMenu = idMenu;
         this.kategori = kategori;
         this.namaMenu = namaMenu;
@@ -21,10 +26,15 @@ public class Menu {
         this.isBestseller = isBestseller;
         this.harga = harga;
         this.deskripsiMenu = deskripsiMenu;
+        this.imagePath = imagePath;
         this.statusTersedia = statusTersedia;
     }
 
     public Menu(String kategori, String namaMenu, String profilRasa, String suhuSajian, boolean isBestseller, int harga, String deskripsiMenu, boolean statusTersedia) {
+        this(kategori, namaMenu, profilRasa, suhuSajian, isBestseller, harga, deskripsiMenu, null, statusTersedia);
+    }
+
+    public Menu(String kategori, String namaMenu, String profilRasa, String suhuSajian, boolean isBestseller, int harga, String deskripsiMenu, String imagePath, boolean statusTersedia) {
         this.kategori = kategori;
         this.namaMenu = namaMenu;
         this.profilRasa = profilRasa;
@@ -32,6 +42,7 @@ public class Menu {
         this.isBestseller = isBestseller;
         this.harga = harga;
         this.deskripsiMenu = deskripsiMenu;
+        this.imagePath = imagePath;
         this.statusTersedia = statusTersedia;
     }
 
@@ -58,6 +69,9 @@ public class Menu {
     }
     public String getDeskripsiMenu() {
         return deskripsiMenu;
+    }
+    public String getImagePath() {
+        return imagePath;
     }
     public boolean isStatusTersedia() {
         return statusTersedia;
