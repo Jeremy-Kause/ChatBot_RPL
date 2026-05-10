@@ -6,16 +6,16 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="rootPane" prefHeight="720.0" prefWidth="1200.0" styleClass="main-bg" stylesheets="@../admin.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.demikopi.uiHandler.MenuManagementController">
+<BorderPane fx:id="rootPane" prefHeight="650.0" prefWidth="1000.0" styleClass="main-bg" stylesheets="@../admin.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.demikopi.uiHandler.MenuManagementController">
     <left>
-        <VBox prefWidth="220.0" styleClass="sidebar">
+        <VBox prefWidth="180.0" styleClass="sidebar">
             <padding>
-                <Insets bottom="24.0" left="16.0" right="16.0" top="24.0" />
+                <Insets bottom="18.0" left="12.0" right="12.0" top="18.0" />
             </padding>
 
-            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="sidebar-logo-box">
-                <StackPane maxHeight="42.0" maxWidth="42.0" prefHeight="42.0" prefWidth="42.0" styleClass="logo-circle">
-                    <ImageView fitHeight="28.0" fitWidth="28.0" preserveRatio="true">
+            <HBox alignment="CENTER_LEFT" spacing="8.0" styleClass="sidebar-logo-box">
+                <StackPane maxHeight="36.0" maxWidth="36.0" prefHeight="36.0" prefWidth="36.0" styleClass="logo-circle">
+                    <ImageView fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
                         <image>
                             <Image url="@../asset/coffee-cup.png" />
                         </image>
@@ -30,7 +30,7 @@
                 </VBox>
             </HBox>
 
-            <Region prefHeight="24.0" />
+            <Region prefHeight="16.0" />
 
             <Label styleClass="nav-section-label" text="MENU UTAMA" />
             <VBox spacing="4.0">
@@ -39,7 +39,7 @@
                 <Button maxWidth="Infinity" onAction="#showFasilitas" styleClass="nav-item" text="Manajemen Fasilitas" />
             </VBox>
 
-            <Region prefHeight="16.0" />
+            <Region prefHeight="12.0" />
 
             <Label styleClass="nav-section-label" text="SISTEM" />
             <VBox spacing="4.0">
@@ -53,12 +53,12 @@
     </left>
 
     <center>
-        <VBox spacing="18.0" styleClass="content-area">
+        <VBox spacing="12.0" styleClass="content-area">
             <padding>
-                <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+                <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
             </padding>
 
-            <HBox alignment="CENTER_LEFT" spacing="12.0">
+            <HBox alignment="CENTER_LEFT" spacing="8.0">
                 <VBox spacing="3.0">
                     <Label styleClass="page-title" text="Manajemen Menu" />
                     <Label styleClass="page-subtitle" text="Tambah, ubah, hapus, dan filter menu DemiKopi" />
@@ -67,8 +67,8 @@
                 <Button onAction="#handleRefreshMenu" styleClass="soft-button" text="Refresh" />
             </HBox>
 
-            <HBox spacing="18.0" VBox.vgrow="ALWAYS">
-                <VBox spacing="12.0" styleClass="table-section" HBox.hgrow="ALWAYS">
+            <HBox spacing="12.0" VBox.vgrow="ALWAYS">
+                <VBox minWidth="0.0" spacing="10.0" styleClass="table-section" HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
                         <VBox spacing="4.0">
                             <Label styleClass="section-title" text="Daftar Menu" />
@@ -79,73 +79,77 @@
 
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
                         <TextField fx:id="searchInput" onKeyReleased="#handleCariMenu" promptText="Cari nama, kategori, rasa, atau sajian..." styleClass="search-field" HBox.hgrow="ALWAYS" />
-                        <ComboBox fx:id="statusFilterInput" onAction="#handleFilterMenu" prefWidth="150.0" styleClass="settings-field" />
+                        <ComboBox fx:id="statusFilterInput" onAction="#handleFilterMenu" prefWidth="120.0" styleClass="settings-field" />
                     </HBox>
 
                     <TableView fx:id="menuTable" styleClass="menu-table" VBox.vgrow="ALWAYS">
                         <columns>
-                            <TableColumn fx:id="namaMenuColumn" prefWidth="190.0" text="Nama Menu" />
-                            <TableColumn fx:id="kategoriColumn" prefWidth="110.0" text="Kategori" />
-                            <TableColumn fx:id="hargaColumn" prefWidth="110.0" text="Harga" />
-                            <TableColumn fx:id="statusColumn" prefWidth="90.0" text="Status" />
-                            <TableColumn fx:id="bestsellerColumn" prefWidth="90.0" text="Bestseller" />
+                            <TableColumn fx:id="namaMenuColumn" prefWidth="145.0" text="Nama Menu" />
+                            <TableColumn fx:id="kategoriColumn" prefWidth="75.0" text="Kategori" />
+                            <TableColumn fx:id="hargaColumn" prefWidth="80.0" text="Harga" />
+                            <TableColumn fx:id="statusColumn" prefWidth="70.0" text="Status" />
+                            <TableColumn fx:id="bestsellerColumn" prefWidth="75.0" text="Bestseller" />
                         </columns>
                     </TableView>
                 </VBox>
 
-                <VBox prefWidth="340.0" spacing="12.0" styleClass="table-section">
-                    <VBox spacing="4.0">
-                        <Label fx:id="formTitleLabel" styleClass="section-title" text="Tambah Menu" />
-                        <Label styleClass="card-subtitle" text="Pilih baris tabel untuk mengedit menu" />
-                    </VBox>
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" minWidth="260.0" prefWidth="270.0" styleClass="content-scroll">
+                    <content>
+                        <VBox spacing="8.0" styleClass="table-section">
+                            <VBox spacing="4.0">
+                                <Label fx:id="formTitleLabel" styleClass="section-title" text="Tambah Menu" />
+                                <Label styleClass="card-subtitle" text="Pilih baris tabel untuk mengedit menu" />
+                            </VBox>
 
-                    <VBox spacing="6.0">
-                        <Label styleClass="form-label" text="Nama Menu" />
-                        <TextField fx:id="namaMenuInput" promptText="Contoh: Kopi Susu Gula Aren" styleClass="settings-field" />
-                    </VBox>
+                            <VBox spacing="5.0">
+                                <Label styleClass="form-label" text="Nama Menu" />
+                                <TextField fx:id="namaMenuInput" promptText="Contoh: Kopi Susu Gula Aren" styleClass="settings-field" />
+                            </VBox>
 
-                    <VBox spacing="6.0">
-                        <Label styleClass="form-label" text="Kategori" />
-                        <ComboBox fx:id="kategoriInput" maxWidth="Infinity" styleClass="settings-field" />
-                    </VBox>
+                            <VBox spacing="5.0">
+                                <Label styleClass="form-label" text="Kategori" />
+                                <ComboBox fx:id="kategoriInput" maxWidth="Infinity" styleClass="settings-field" />
+                            </VBox>
 
-                    <VBox spacing="6.0">
-                        <Label styleClass="form-label" text="Profil Rasa" />
-                        <TextField fx:id="profilRasaInput" promptText="manis, creamy, caramel" styleClass="settings-field" />
-                    </VBox>
+                            <VBox spacing="5.0">
+                                <Label styleClass="form-label" text="Profil Rasa" />
+                                <TextField fx:id="profilRasaInput" promptText="manis, creamy, caramel" styleClass="settings-field" />
+                            </VBox>
 
-                    <HBox spacing="10.0">
-                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
-                            <Label styleClass="form-label" text="Suhu Sajian" />
-                            <TextField fx:id="suhuSajianInput" promptText="panas/dingin" styleClass="settings-field" />
+                            <HBox spacing="8.0">
+                                <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                    <Label styleClass="form-label" text="Suhu Sajian" />
+                                    <TextField fx:id="suhuSajianInput" promptText="panas/dingin" styleClass="settings-field" />
+                                </VBox>
+                                <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                    <Label styleClass="form-label" text="Harga" />
+                                    <TextField fx:id="hargaInput" promptText="25000" styleClass="settings-field" />
+                                </VBox>
+                            </HBox>
+
+                            <VBox spacing="5.0">
+                                <Label styleClass="form-label" text="Deskripsi" />
+                                <TextArea fx:id="deskripsiInput" prefRowCount="2" promptText="Deskripsi singkat menu" styleClass="settings-field" wrapText="true" />
+                            </VBox>
+
+                            <VBox spacing="5.0">
+                                <Label styleClass="form-label" text="Path Gambar" />
+                                <TextField fx:id="imagePathInput" promptText="asset/menu/caramel-macchiato.jpg" styleClass="settings-field" />
+                            </VBox>
+
+                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                <CheckBox fx:id="bestsellerCheck" styleClass="settings-check" text="Bestseller" />
+                                <CheckBox fx:id="tersediaCheck" styleClass="settings-check" text="Tersedia" />
+                            </HBox>
+
+                            <HBox alignment="CENTER_RIGHT" spacing="6.0">
+                                <Button onAction="#handleBersihkanForm" styleClass="soft-button" text="Bersihkan" />
+                                <Button onAction="#handleHapusMenu" styleClass="danger-button" text="Hapus" />
+                                <Button onAction="#handleSimpanMenu" styleClass="button-primary" text="Simpan" />
+                            </HBox>
                         </VBox>
-                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
-                            <Label styleClass="form-label" text="Harga" />
-                            <TextField fx:id="hargaInput" promptText="25000" styleClass="settings-field" />
-                        </VBox>
-                    </HBox>
-
-                    <VBox spacing="6.0">
-                        <Label styleClass="form-label" text="Deskripsi" />
-                        <TextArea fx:id="deskripsiInput" prefRowCount="3" promptText="Deskripsi singkat menu" styleClass="settings-field" wrapText="true" />
-                    </VBox>
-
-                    <VBox spacing="6.0">
-                        <Label styleClass="form-label" text="Path Gambar" />
-                        <TextField fx:id="imagePathInput" promptText="asset/menu/caramel-macchiato.jpg" styleClass="settings-field" />
-                    </VBox>
-
-                    <HBox alignment="CENTER_LEFT" spacing="18.0">
-                        <CheckBox fx:id="bestsellerCheck" styleClass="settings-check" text="Bestseller" />
-                        <CheckBox fx:id="tersediaCheck" styleClass="settings-check" text="Tersedia" />
-                    </HBox>
-
-                    <HBox alignment="CENTER_RIGHT" spacing="8.0">
-                        <Button onAction="#handleBersihkanForm" styleClass="soft-button" text="Bersihkan" />
-                        <Button onAction="#handleHapusMenu" styleClass="danger-button" text="Hapus" />
-                        <Button onAction="#handleSimpanMenu" styleClass="button-primary" text="Simpan" />
-                    </HBox>
-                </VBox>
+                    </content>
+                </ScrollPane>
             </HBox>
         </VBox>
     </center>

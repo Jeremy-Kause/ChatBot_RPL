@@ -264,11 +264,24 @@ public class UserDashboardController {
         subtitle.setMaxWidth(140);
         subtitle.getStyleClass().add("recommendation-subtitle");
 
-        VBox card = new VBox(6, imageFrame, title, subtitle);
+        Button detailButton = new Button("Lihat Detail");
+        detailButton.setMaxWidth(Double.MAX_VALUE);
+        detailButton.getStyleClass().add("recommendation-detail-button");
+        detailButton.setOnAction(event -> tampilkanDetailMenu(chatImage.getTitle()));
+
+        VBox card = new VBox(6, imageFrame, title, subtitle, detailButton);
         card.setPrefWidth(156);
         card.setMaxWidth(156);
         card.getStyleClass().add("recommendation-card");
         return card;
+    }
+
+    private void tampilkanDetailMenu(String namaMenu) {
+        if (namaMenu == null || namaMenu.isBlank()) {
+            return;
+        }
+
+        kirimPesan("Detail " + namaMenu);
     }
 
     private String resolveSumberGambar(String imagePath) {

@@ -29,8 +29,8 @@
 
         <!-- Form Input -->
         <VBox spacing="15">
-            <TextField fx:id="usernameInput" promptText="Username" styleClass="text-input" />
-            <PasswordField fx:id="passInput" promptText="Password" styleClass="text-input" />
+            <TextField fx:id="usernameInput" onAction="#handleLogin" promptText="Username" styleClass="text-input" />
+            <PasswordField fx:id="passInput" onAction="#handleLogin" promptText="Password" styleClass="text-input" />
         </VBox>
 
         <!-- Action Buttons -->

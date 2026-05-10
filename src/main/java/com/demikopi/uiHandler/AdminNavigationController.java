@@ -23,8 +23,8 @@ public class AdminNavigationController {
     private static final String PAGE_MENU = "menu-management.fxml";
     private static final String PAGE_FASILITAS = "facility-management.fxml";
     private static final String PAGE_SETTINGS = "settings-view.fxml";
-    private static final double DEFAULT_WIDTH = 1200;
-    private static final double DEFAULT_HEIGHT = 720;
+    private static final double DEFAULT_WIDTH = 1000;
+    private static final double DEFAULT_HEIGHT = 650;
     private static final double LOGIN_WIDTH = 900;
     private static final double LOGIN_HEIGHT = 600;
 

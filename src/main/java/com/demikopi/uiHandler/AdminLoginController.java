@@ -52,10 +52,11 @@ public class AdminLoginController {
                 return;
             }
             FXMLLoader loader = new FXMLLoader(dashboardUrl);
-            Scene scene = new Scene(loader.load(), 1200, 720);
+            Scene scene = new Scene(loader.load(), 1000, 650);
             Stage stage = (Stage) usernameInput.getScene().getWindow();
             stage.setTitle("DemiKopi Admin Dashboard");
             stage.setScene(scene);
+            stage.centerOnScreen();
         } catch (IOException e) {
             e.printStackTrace();
             showAlert("Error", "Gagal membuka dashboard admin: " + e.getMessage());
