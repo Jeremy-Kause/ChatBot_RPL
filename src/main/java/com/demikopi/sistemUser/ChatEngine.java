@@ -36,8 +36,12 @@ public class ChatEngine {
     }
 
     public String getResponse(String inputUser) {
+        return getChatResponse(inputUser).getText();
+    }
+
+    public ChatResponse getChatResponse(String inputUser) {
         if (inputUser == null || inputUser.trim().isEmpty()) {
-            return buildResponseFallback();
+            return ChatResponse.text(buildResponseFallback());
         }
 
         NLPService nlp = new NLPService(inputUser);
@@ -45,30 +49,30 @@ public class ChatEngine {
 
         Menu menuLangsung = cariMenuLangsungJikaPerlu(inputUser, intent);
         if (menuLangsung != null) {
-            return buildResponseDetailMenu(menuLangsung);
+            return buildChatResponseDetailMenu(menuLangsung);
         }
 
         String keyword = nlp.extractKeyword(intent);
 
         switch (intent) {
             case SALAM:
-                return buildResponseSalam();
+                return ChatResponse.text(buildResponseSalam());
             case TANYA_MENU:
-                return buildResponseSemuaMenu();
+                return ChatResponse.text(buildResponseSemuaMenu());
             case TANYA_KATEGORI:
-                return buildResponseMenuKategori(keyword);
+                return ChatResponse.text(buildResponseMenuKategori(keyword));
             case TANYA_REKOMENDASI:
-                return rekomendasi.getRekomendasi(keyword, ambilMenuTersedia());
+                return buildChatResponseRekomendasi(keyword);
             case TANYA_DETAIL_MENU:
-                return buildResponseDetailMenu(keyword);
+                return buildChatResponseDetailMenu(keyword);
             case TANYA_JAM_BUKA:
-                return buildResponseJamBuka();
+                return ChatResponse.text(buildResponseJamBuka());
             case TANYA_LOKASI:
-                return buildResponseLokasi();
+                return ChatResponse.text(buildResponseLokasi());
             case TANYA_FASILITAS:
-                return buildResponseFasilitas();
+                return ChatResponse.text(buildResponseFasilitas());
             default:
-                return buildResponseFallback();
+                return ChatResponse.text(buildResponseFallback());
         }
     }
 
@@ -143,6 +147,45 @@ public class ChatEngine {
         }
 
         return buildResponseDetailMenu(menu);
+    }
+
+    private ChatResponse buildChatResponseDetailMenu(String namaMenu) {
+        if (namaMenu == null || namaMenu.isEmpty()) {
+            return ChatResponse.text("Bisa tolong sebutkan nama spesifik menunya yang ingin kamu ketahui?");
+        }
+
+        Menu menu = cariMenuByNama(namaMenu);
+        if (menu == null) {
+            return ChatResponse.text("Maaf, menu '" + namaMenu + "' tidak kami temukan. Coba nama lain.");
+        }
+
+        return buildChatResponseDetailMenu(menu);
+    }
+
+    private ChatResponse buildChatResponseDetailMenu(Menu menu) {
+        String responseText = buildResponseDetailMenu(menu);
+        if (menu.getImagePath() == null || menu.getImagePath().isBlank()) {
+            return ChatResponse.text(responseText);
+        }
+        return ChatResponse.withImage(responseText, menu.getImagePath());
+    }
+
+    private ChatResponse buildChatResponseRekomendasi(String keyword) {
+        List<Menu> menus = ambilMenuTersedia();
+        String responseText = rekomendasi.getRekomendasi(keyword, menus);
+        List<ChatResponse.ChatImage> images = rekomendasi.getMenuRekomendasi(keyword, menus, 0).stream()
+                .filter(menu -> menu.getImagePath() != null && !menu.getImagePath().isBlank())
+                .map(menu -> new ChatResponse.ChatImage(
+                        menu.getNamaMenu(),
+                        isiAtauStrip(menu.getKategori()) + " - " + formatRupiah(menu.getHarga()),
+                        menu.getImagePath()
+                ))
+                .collect(Collectors.toList());
+
+        if (images.isEmpty()) {
+            return ChatResponse.text(responseText);
+        }
+        return ChatResponse.withImages(responseText, images);
     }
 
     private String buildResponseDetailMenu(Menu menu) {
