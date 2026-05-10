@@ -6,17 +6,17 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="rootPane" prefHeight="720.0" prefWidth="1200.0" styleClass="main-bg" stylesheets="@../admin.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.demikopi.uiHandler.AdminDashboardController">
+<BorderPane fx:id="rootPane" prefHeight="650.0" prefWidth="1000.0" styleClass="main-bg" stylesheets="@../admin.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.demikopi.uiHandler.AdminDashboardController">
 
     <left>
-        <VBox prefWidth="220.0" styleClass="sidebar">
+        <VBox prefWidth="180.0" styleClass="sidebar">
             <padding>
-                <Insets bottom="24.0" left="16.0" right="16.0" top="24.0" />
+                <Insets bottom="18.0" left="12.0" right="12.0" top="18.0" />
             </padding>
 
-            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="sidebar-logo-box">
-                <StackPane maxHeight="42.0" maxWidth="42.0" prefHeight="42.0" prefWidth="42.0" styleClass="logo-circle">
-                    <ImageView fitHeight="28.0" fitWidth="28.0" preserveRatio="true">
+            <HBox alignment="CENTER_LEFT" spacing="8.0" styleClass="sidebar-logo-box">
+                <StackPane maxHeight="36.0" maxWidth="36.0" prefHeight="36.0" prefWidth="36.0" styleClass="logo-circle">
+                    <ImageView fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
                         <image>
                             <Image url="@../asset/coffee-cup.png" />
                         </image>
@@ -31,7 +31,7 @@
                 </VBox>
             </HBox>
 
-            <Region prefHeight="24.0" />
+            <Region prefHeight="16.0" />
 
             <Label styleClass="nav-section-label" text="MENU UTAMA" />
             <VBox spacing="4.0">
@@ -40,7 +40,7 @@
                 <Button maxWidth="Infinity" onAction="#showFasilitas" styleClass="nav-item" text="Manajemen Fasilitas" />
             </VBox>
 
-            <Region prefHeight="16.0" />
+            <Region prefHeight="12.0" />
 
             <Label styleClass="nav-section-label" text="SISTEM" />
             <VBox spacing="4.0">
@@ -54,12 +54,12 @@
     </left>
 
     <center>
-        <VBox spacing="18.0" styleClass="content-area">
+        <VBox spacing="12.0" styleClass="content-area">
             <padding>
-                <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+                <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
             </padding>
 
-            <HBox alignment="CENTER_LEFT" spacing="12.0">
+            <HBox alignment="CENTER_LEFT" spacing="8.0">
                 <VBox spacing="3.0">
                     <Label styleClass="page-title" text="Dashboard" />
                     <Label styleClass="page-subtitle" text="Ringkasan data admin chatbot DemiKopi" />
@@ -71,8 +71,8 @@
 
             <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="content-scroll" VBox.vgrow="ALWAYS">
                 <content>
-                    <VBox spacing="18.0" styleClass="page-shell">
-                        <GridPane hgap="14.0" vgap="14.0">
+                    <VBox spacing="12.0" styleClass="page-shell">
+                        <GridPane hgap="10.0" vgap="10.0">
                             <columnConstraints>
                                 <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0" />
                                 <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0" />
@@ -105,8 +105,8 @@
                             </VBox>
                         </GridPane>
 
-                        <HBox spacing="18.0">
-                            <VBox spacing="12.0" styleClass="table-section" HBox.hgrow="ALWAYS">
+                        <HBox spacing="12.0">
+                            <VBox minWidth="0.0" spacing="10.0" styleClass="table-section" HBox.hgrow="ALWAYS">
                                 <HBox alignment="CENTER_LEFT">
                                     <VBox spacing="4.0">
                                         <Label styleClass="section-title" text="Ringkasan Operasional" />
@@ -125,28 +125,28 @@
                                 <VBox fx:id="ringkasanOperasionalList" spacing="0.0" />
                             </VBox>
 
-                            <VBox prefWidth="290.0" spacing="12.0" styleClass="side-panel">
+                            <VBox minWidth="230.0" prefWidth="250.0" spacing="10.0" styleClass="side-panel">
                                 <Label styleClass="section-title" text="Sorotan" />
 
-                                <VBox spacing="10.0" styleClass="mini-card">
+                                <VBox spacing="8.0" styleClass="mini-card">
                                     <Label styleClass="mini-card-title" text="Top Menu" />
                                     <Label fx:id="topMenuLabel" styleClass="mini-card-value" text="--" wrapText="true" />
                                     <Label styleClass="card-subtitle" text="Bestseller tersedia pertama" />
                                 </VBox>
 
-                                <VBox spacing="10.0" styleClass="mini-card">
+                                <VBox spacing="8.0" styleClass="mini-card">
                                     <Label styleClass="mini-card-title" text="Top Kategori" />
                                     <Label fx:id="topKategoriLabel" styleClass="mini-card-value" text="--" wrapText="true" />
                                     <Label styleClass="card-subtitle" text="Kategori dengan item terbanyak" />
                                 </VBox>
 
-                                <VBox spacing="10.0" styleClass="mini-card">
+                                <VBox spacing="8.0" styleClass="mini-card">
                                     <Label styleClass="mini-card-title" text="Info Kedai" />
                                     <Label fx:id="infoKedaiStatusLabel" styleClass="mini-card-value" text="--" />
                                     <Label styleClass="card-subtitle" text="Jam buka, lokasi, dan kontak" />
                                 </VBox>
 
-                                <VBox spacing="10.0" styleClass="mini-card accent-card">
+                                <VBox spacing="8.0" styleClass="mini-card accent-card">
                                     <Label styleClass="mini-card-title light-text" text="Agenda Admin" />
                                     <Label fx:id="agendaLabel" styleClass="mini-card-value light-text" text="--" wrapText="true" />
                                     <Label styleClass="card-subtitle light-subtext" text="Tindak lanjut data hari ini" wrapText="true" />

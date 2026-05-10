@@ -16,17 +16,17 @@
 }
 
 .sidebar-logo-box {
-    -fx-padding: 8 0 4 0;
+    -fx-padding: 6 0 2 0;
 }
 
 .sidebar-logo {
-    -fx-font-size: 22;
+    -fx-font-size: 18;
     -fx-font-weight: bold;
     -fx-text-fill: white;
 }
 
 .sidebar-logo-sub {
-    -fx-font-size: 12;
+    -fx-font-size: 11;
     -fx-text-fill: #EADFD6;
 }
 
@@ -42,8 +42,8 @@
     -fx-background-radius: 10;
     -fx-text-fill: white;
     -fx-alignment: CENTER_LEFT;
-    -fx-padding: 12 14;
-    -fx-font-size: 13;
+    -fx-padding: 10 11;
+    -fx-font-size: 12;
     -fx-cursor: hand;
 }
 
@@ -65,13 +65,13 @@
 }
 
 .page-title {
-    -fx-font-size: 28;
+    -fx-font-size: 24;
     -fx-font-weight: bold;
     -fx-text-fill: -fx-primary;
 }
 
 .page-subtitle {
-    -fx-font-size: 13;
+    -fx-font-size: 12;
     -fx-text-fill: -fx-text-muted;
 }
 
@@ -80,7 +80,8 @@
     -fx-background-radius: 20;
     -fx-border-color: -fx-border;
     -fx-border-radius: 20;
-    -fx-padding: 8 14;
+    -fx-padding: 7 11;
+    -fx-font-size: 12;
     -fx-text-fill: -fx-text-muted;
 }
 
@@ -115,7 +116,7 @@
     -fx-border-radius: 10;
     -fx-border-color: #D3D3D3;
     -fx-background-color: white;
-    -fx-padding: 10 15;
+    -fx-padding: 8 12;
 }
 
 .button-primary,
@@ -124,8 +125,9 @@
     -fx-background-color: -fx-primary;
     -fx-text-fill: white;
     -fx-background-radius: 12;
-    -fx-padding: 10 16;
+    -fx-padding: 8 12;
     -fx-font-weight: bold;
+    -fx-font-size: 12;
 }
 
 .content-scroll {
@@ -153,13 +155,13 @@
 }
 
 .stat-card {
-    -fx-padding: 18;
+    -fx-padding: 14;
 }
 
 .table-section,
 .mini-card,
 .menu-card {
-    -fx-padding: 16;
+    -fx-padding: 14;
 }
 
 .dim-card {
@@ -175,21 +177,21 @@
 }
 
 .stat-value {
-    -fx-font-size: 30;
+    -fx-font-size: 24;
     -fx-font-weight: bold;
     -fx-text-fill: -fx-text-dark;
 }
 
 .stat-value-sm,
 .mini-card-value {
-    -fx-font-size: 22;
+    -fx-font-size: 18;
     -fx-font-weight: bold;
     -fx-text-fill: -fx-text-dark;
 }
 
 .section-title,
 .menu-card-title {
-    -fx-font-size: 18;
+    -fx-font-size: 16;
     -fx-font-weight: bold;
     -fx-text-fill: -fx-text-dark;
 }
@@ -207,9 +209,9 @@
 .chip {
     -fx-background-color: #EFE6DC;
     -fx-background-radius: 20;
-    -fx-padding: 7 12;
+    -fx-padding: 6 10;
     -fx-text-fill: #6E594D;
-    -fx-font-size: 12;
+    -fx-font-size: 11;
     -fx-font-weight: bold;
 }
 
@@ -230,7 +232,7 @@
     -fx-font-size: 12;
     -fx-font-weight: bold;
     -fx-text-fill: #7C6759;
-    -fx-pref-width: 96;
+    -fx-pref-width: 78;
 }
 
 .flex-label {
@@ -239,16 +241,16 @@
 }
 
 .list-wide {
-    -fx-pref-width: 320;
+    -fx-pref-width: 240;
 }
 
 .list-row,
 .user-row {
     -fx-alignment: center-left;
-    -fx-padding: 10 4;
+    -fx-padding: 8 4;
     -fx-border-color: #F3EBE4;
     -fx-border-width: 0 0 1 0;
-    -fx-spacing: 12;
+    -fx-spacing: 10;
 }
 
 .row-title {
@@ -307,7 +309,7 @@
 .soft-button {
     -fx-background-color: #F5EDE5;
     -fx-background-radius: 12;
-    -fx-padding: 8 12;
+    -fx-padding: 7 10;
     -fx-text-fill: -fx-primary;
     -fx-font-size: 12;
     -fx-font-weight: bold;
@@ -316,7 +318,7 @@
 .danger-button {
     -fx-background-color: #FDE7E4;
     -fx-background-radius: 12;
-    -fx-padding: 8 12;
+    -fx-padding: 7 10;
     -fx-text-fill: #B42318;
     -fx-font-size: 12;
     -fx-font-weight: bold;
