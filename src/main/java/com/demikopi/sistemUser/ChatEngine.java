@@ -6,9 +6,11 @@ import com.demikopi.dataAccess.MenuDAO;
 import com.demikopi.model.Fasilitas;
 import com.demikopi.model.InfoKedai;
 import com.demikopi.model.Menu;
+import com.demikopi.sistemUser.ChatResponse.ChatBlock;
 import com.demikopi.sistemUser.NLPService.Intent;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -56,24 +58,31 @@ public class ChatEngine {
 
         switch (intent) {
             case SALAM:
-                return ChatResponse.text(buildResponseSalam());
+                return buildChatResponseSalam();
             case TANYA_MENU:
-                return ChatResponse.text(buildResponseSemuaMenu());
+                return buildChatResponseSemuaMenu();
             case TANYA_KATEGORI:
-                return ChatResponse.text(buildResponseMenuKategori(keyword));
+                return buildChatResponseMenuKategori(keyword);
             case TANYA_REKOMENDASI:
                 return buildChatResponseRekomendasi(keyword);
             case TANYA_DETAIL_MENU:
                 return buildChatResponseDetailMenu(keyword);
             case TANYA_JAM_BUKA:
-                return ChatResponse.text(buildResponseJamBuka());
+                return buildChatResponseJamBuka();
             case TANYA_LOKASI:
-                return ChatResponse.text(buildResponseLokasi());
+                return buildChatResponseLokasi();
             case TANYA_FASILITAS:
-                return ChatResponse.text(buildResponseFasilitas());
+                return buildChatResponseFasilitas();
             default:
-                return ChatResponse.text(buildResponseFallback());
+                return buildChatResponseFallback();
         }
+    }
+
+    private ChatResponse buildChatResponseSalam() {
+        return ChatResponse.formatted(buildResponseSalam(), List.of(
+                ChatBlock.title("Halo! Selamat datang di DEMIKOPI"),
+                ChatBlock.paragraph("Aku adalah asisten chatbot yang bisa membantu soal menu, rekomendasi, jam buka, lokasi, atau fasilitas kami.")
+        ));
     }
 
     private String buildResponseSalam() {
@@ -81,20 +90,26 @@ public class ChatEngine {
                 "Kamu bisa tanya soal menu, rekomendasi, jam buka, lokasi, atau fasilitas kami.";
     }
 
-    private String buildResponseSemuaMenu() {
+    private ChatResponse buildChatResponseSemuaMenu() {
         List<Menu> menus = ambilMenuTersedia();
         if (menus.isEmpty()) {
-            return "Maaf, belum ada menu yang tersedia saat ini.";
+            return ChatResponse.formatted("Maaf, belum ada menu yang tersedia saat ini.",
+                    List.of(ChatBlock.note("Maaf, belum ada menu yang tersedia saat ini.")));
         }
 
         Map<String, List<Menu>> grouped = menus.stream()
                 .collect(Collectors.groupingBy(Menu::getKategori, LinkedHashMap::new, Collectors.toList()));
 
+        List<ChatBlock> blocks = new ArrayList<>();
+        blocks.add(ChatBlock.title("Berikut menu-menu kami"));
+
         StringBuilder sb = new StringBuilder("Berikut menu-menu kami:\n\n");
         for (Map.Entry<String, List<Menu>> set : grouped.entrySet()) {
-            sb.append("[").append(set.getKey().toUpperCase()).append("]\n");
+            blocks.add(ChatBlock.section(set.getKey().toUpperCase(Locale.ROOT)));
+            sb.append("[").append(set.getKey().toUpperCase(Locale.ROOT)).append("]\n");
             int nomor = 1;
             for (Menu menu : set.getValue()) {
+                blocks.add(ChatBlock.numberedItem(nomor, menu.getNamaMenu(), formatRupiah(menu.getHarga())));
                 sb.append(nomor)
                         .append(". ")
                         .append(menu.getNamaMenu())
@@ -105,12 +120,17 @@ public class ChatEngine {
             }
             sb.append("\n");
         }
-        return sb.toString().trim();
+        return ChatResponse.formatted(sb.toString().trim(), blocks);
     }
 
-    private String buildResponseMenuKategori(String kategori) {
+    private String buildResponseSemuaMenu() {
+        return buildChatResponseSemuaMenu().getText();
+    }
+
+    private ChatResponse buildChatResponseMenuKategori(String kategori) {
         if (kategori == null || kategori.isEmpty()) {
-            return "Bisa tolong perjelas kategori apa yang kamu maksud? Contoh: kopi, non-kopi, makanan, atau mix.";
+            String text = "Bisa tolong perjelas kategori apa yang kamu maksud? Contoh: kopi, non-kopi, makanan, atau mix.";
+            return ChatResponse.formatted(text, List.of(ChatBlock.note(text)));
         }
 
         List<Menu> menus = ambilMenuTersedia().stream()
@@ -118,13 +138,18 @@ public class ChatEngine {
                 .collect(Collectors.toList());
 
         if (menus.isEmpty()) {
-            return "Maaf, kategori " + kategori + " tidak kami temukan atau sedang kosong saat ini.";
+            String text = "Maaf, kategori " + kategori + " tidak kami temukan atau sedang kosong saat ini.";
+            return ChatResponse.formatted(text, List.of(ChatBlock.note(text)));
         }
+
+        List<ChatBlock> blocks = new ArrayList<>();
+        blocks.add(ChatBlock.title("Menu kategori " + kategori));
 
         StringBuilder sb = new StringBuilder();
         sb.append("Berikut menu kategori ").append(kategori).append(" kami:\n\n");
         int nomor = 1;
         for (Menu menu : menus) {
+            blocks.add(ChatBlock.numberedItem(nomor, menu.getNamaMenu(), formatRupiah(menu.getHarga())));
             sb.append(nomor)
                     .append(". ")
                     .append(menu.getNamaMenu())
@@ -133,7 +158,11 @@ public class ChatEngine {
                     .append("\n");
             nomor++;
         }
-        return sb.toString().trim();
+        return withMenuImages(sb.toString().trim(), blocks, menus);
+    }
+
+    private String buildResponseMenuKategori(String kategori) {
+        return buildChatResponseMenuKategori(kategori).getText();
     }
 
     private String buildResponseDetailMenu(String namaMenu) {
@@ -164,28 +193,32 @@ public class ChatEngine {
 
     private ChatResponse buildChatResponseDetailMenu(Menu menu) {
         String responseText = buildResponseDetailMenu(menu);
-        if (menu.getImagePath() == null || menu.getImagePath().isBlank()) {
-            return ChatResponse.text(responseText);
+        List<ChatBlock> blocks = buildBlocksDetailMenu(menu);
+        String imagePath = imagePathMenu(menu);
+        if (imagePath == null || imagePath.isBlank()) {
+            return ChatResponse.formatted(responseText, blocks);
         }
-        return ChatResponse.withImage(responseText, menu.getImagePath());
+        return ChatResponse.withImage(responseText, imagePath, blocks);
     }
 
     private ChatResponse buildChatResponseRekomendasi(String keyword) {
         List<Menu> menus = ambilMenuTersedia();
         String responseText = rekomendasi.getRekomendasi(keyword, menus);
-        List<ChatResponse.ChatImage> images = rekomendasi.getMenuRekomendasi(keyword, menus, 0).stream()
-                .filter(menu -> menu.getImagePath() != null && !menu.getImagePath().isBlank())
+        List<Menu> menuRekomendasi = rekomendasi.getMenuRekomendasi(keyword, menus, 0);
+        List<ChatBlock> blocks = buildBlocksRekomendasi(responseText, menuRekomendasi);
+        List<ChatResponse.ChatImage> images = menuRekomendasi.stream()
                 .map(menu -> new ChatResponse.ChatImage(
                         menu.getNamaMenu(),
                         isiAtauStrip(menu.getKategori()) + " - " + formatRupiah(menu.getHarga()),
-                        menu.getImagePath()
+                        imagePathMenu(menu)
                 ))
+                .filter(image -> image.getImagePath() != null && !image.getImagePath().isBlank())
                 .collect(Collectors.toList());
 
         if (images.isEmpty()) {
-            return ChatResponse.text(responseText);
+            return ChatResponse.formatted(responseText, blocks);
         }
-        return ChatResponse.withImages(responseText, images);
+        return ChatResponse.withImages(responseText, images, blocks);
     }
 
     private String buildResponseDetailMenu(Menu menu) {
@@ -202,12 +235,71 @@ public class ChatEngine {
         return sb.toString();
     }
 
+    private List<ChatBlock> buildBlocksDetailMenu(Menu menu) {
+        List<ChatBlock> blocks = new ArrayList<>();
+        blocks.add(ChatBlock.title(menu.getNamaMenu()));
+        blocks.add(ChatBlock.detailRow("Kategori", isiAtauStrip(menu.getKategori())));
+        blocks.add(ChatBlock.detailRow("Rasa", isiAtauStrip(menu.getProfilRasa())));
+        blocks.add(ChatBlock.detailRow("Sajian", isiAtauStrip(menu.getSuhuSajian())));
+        blocks.add(ChatBlock.detailRow("Harga", formatRupiah(menu.getHarga())));
+        if (menu.getDeskripsiMenu() != null && !menu.getDeskripsiMenu().isBlank()) {
+            blocks.add(ChatBlock.paragraph(menu.getDeskripsiMenu()));
+        }
+        return blocks;
+    }
+
+    private List<ChatBlock> buildBlocksRekomendasi(String responseText, List<Menu> menus) {
+        List<ChatBlock> blocks = new ArrayList<>();
+        blocks.add(ChatBlock.title(ambilBarisPertama(responseText, "Rekomendasi menu untukmu")));
+        if (menus == null || menus.isEmpty()) {
+            return blocks;
+        }
+
+        int nomor = 1;
+        for (Menu menu : menus) {
+            String subtitle = isiAtauStrip(menu.getKategori()) + " - " + formatRupiah(menu.getHarga());
+            if (menu.isBestseller()) {
+                subtitle += " - Best Seller";
+            }
+            blocks.add(ChatBlock.numberedItem(nomor, menu.getNamaMenu(), subtitle));
+            nomor++;
+        }
+        return blocks;
+    }
+
+    private ChatResponse buildChatResponseJamBuka() {
+        String text = buildResponseJamBuka();
+        if (text.startsWith("Maaf")) {
+            return ChatResponse.formatted(text, List.of(ChatBlock.note(text)));
+        }
+
+        InfoKedai info = ambilInfoKedai();
+        return ChatResponse.formatted(text, List.of(
+                ChatBlock.title("Jam buka DEMIKOPI"),
+                ChatBlock.detailRow("Jadwal", info == null ? "-" : isiAtauStrip(info.getJamOperasional()))
+        ));
+    }
+
     private String buildResponseJamBuka() {
         InfoKedai info = ambilInfoKedai();
         if (info == null || info.getJamOperasional() == null || info.getJamOperasional().isBlank()) {
             return "Maaf, informasi jam buka belum diatur.";
         }
         return "DEMIKOPI buka dengan jadwal berikut:\n" + info.getJamOperasional();
+    }
+
+    private ChatResponse buildChatResponseLokasi() {
+        String text = buildResponseLokasi();
+        if (text.startsWith("Maaf")) {
+            return ChatResponse.formatted(text, List.of(ChatBlock.note(text)));
+        }
+
+        InfoKedai info = ambilInfoKedai();
+        return ChatResponse.formatted(text, List.of(
+                ChatBlock.title("Lokasi DEMIKOPI"),
+                ChatBlock.paragraph(info == null ? "-" : isiAtauStrip(info.getLokasi())),
+                ChatBlock.detailRow("Kontak", info == null ? "-" : isiAtauStrip(info.getKontak()))
+        ));
     }
 
     private String buildResponseLokasi() {
@@ -218,15 +310,20 @@ public class ChatEngine {
         return "Kami berlokasi di:\n" + info.getLokasi() + "\nKontak: " + isiAtauStrip(info.getKontak());
     }
 
-    private String buildResponseFasilitas() {
+    private ChatResponse buildChatResponseFasilitas() {
         List<Fasilitas> fasilitas = ambilFasilitas();
         if (fasilitas.isEmpty()) {
-            return "Maaf, daftar fasilitas kedai belum diperbarui.";
+            String text = "Maaf, daftar fasilitas kedai belum diperbarui.";
+            return ChatResponse.formatted(text, List.of(ChatBlock.note(text)));
         }
+
+        List<ChatBlock> blocks = new ArrayList<>();
+        blocks.add(ChatBlock.title("Fasilitas di DEMIKOPI"));
 
         StringBuilder sb = new StringBuilder("Fasilitas di DEMIKOPI:\n\n");
         int nomor = 1;
         for (Fasilitas item : fasilitas) {
+            blocks.add(ChatBlock.numberedDetailItem(nomor, item.getNamaFasilitas(), isiAtauStrip(item.getDeskripsiFasilitas())));
             sb.append(nomor)
                     .append(". ")
                     .append(item.getNamaFasilitas())
@@ -235,7 +332,18 @@ public class ChatEngine {
                     .append("\n\n");
             nomor++;
         }
-        return sb.toString().trim();
+        return ChatResponse.formatted(sb.toString().trim(), blocks);
+    }
+
+    private String buildResponseFasilitas() {
+        return buildChatResponseFasilitas().getText();
+    }
+
+    private ChatResponse buildChatResponseFallback() {
+        return ChatResponse.formatted(buildResponseFallback(), List.of(
+                ChatBlock.note("Maaf, aku belum mengerti maksudmu."),
+                ChatBlock.paragraph("Coba tanya soal: menu, rekomendasi, jam buka, lokasi, atau fasilitas.")
+        ));
     }
 
     private String buildResponseFallback() {
@@ -345,5 +453,51 @@ public class ChatEngine {
 
     private String isiAtauStrip(String value) {
         return value == null || value.isBlank() ? "-" : value;
+    }
+
+    private String ambilBarisPertama(String text, String fallback) {
+        if (text == null || text.isBlank()) {
+            return fallback;
+        }
+
+        String firstLine = text.split("\\R", 2)[0].trim();
+        return firstLine.isEmpty() ? fallback : firstLine.replace(":", "");
+    }
+
+    private ChatResponse withMenuImages(String responseText, List<ChatBlock> blocks, List<Menu> menus) {
+        List<ChatResponse.ChatImage> images = menus.stream()
+                .map(menu -> new ChatResponse.ChatImage(
+                        menu.getNamaMenu(),
+                        isiAtauStrip(menu.getKategori()) + " - " + formatRupiah(menu.getHarga()),
+                        imagePathMenu(menu)
+                ))
+                .filter(image -> image.getImagePath() != null && !image.getImagePath().isBlank())
+                .collect(Collectors.toList());
+
+        if (images.isEmpty()) {
+            return ChatResponse.formatted(responseText, blocks);
+        }
+        return ChatResponse.withImages(responseText, images, blocks);
+    }
+
+    private String imagePathMenu(Menu menu) {
+        if (menu == null) {
+            return null;
+        }
+        if (menu.getImagePath() != null && !menu.getImagePath().isBlank()) {
+            return menu.getImagePath();
+        }
+        return "asset/menu/" + slugNamaMenu(menu.getNamaMenu()) + ".jpg";
+    }
+
+    private String slugNamaMenu(String namaMenu) {
+        if (namaMenu == null || namaMenu.isBlank()) {
+            return "";
+        }
+        return namaMenu.toLowerCase(Locale.ROOT)
+                .replaceAll("[^a-z0-9\\s-]", "")
+                .replaceAll("\\s+", "-")
+                .replaceAll("-+", "-")
+                .replaceAll("^-|-$", "");
     }
 }

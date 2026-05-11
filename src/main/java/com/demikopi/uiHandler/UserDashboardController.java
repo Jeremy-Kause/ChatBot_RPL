@@ -2,6 +2,7 @@ package com.demikopi.uiHandler;
 
 import com.demikopi.sistemUser.ChatEngine;
 import com.demikopi.sistemUser.ChatResponse;
+import com.demikopi.sistemUser.ChatResponse.ChatBlock;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -16,6 +17,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -169,14 +171,10 @@ public class UserDashboardController {
         bubble.maxWidthProperty().bind(chatScroll.widthProperty().multiply(0.72));
         bubble.getStyleClass().add("bubble-bot");
 
-        Label text = new Label(response.getText());
-        text.setWrapText(true);
-        text.setTextOverrun(OverrunStyle.CLIP);
-        text.setMinHeight(Region.USE_PREF_SIZE);
-        text.prefWidthProperty().bind(chatScroll.widthProperty().multiply(0.66));
-        text.maxWidthProperty().bind(chatScroll.widthProperty().multiply(0.66));
-        text.getStyleClass().add("bubble-bot-text");
-        bubble.getChildren().add(text);
+        Node textContent = buatKontenTeksBot(response);
+        if (textContent != null) {
+            bubble.getChildren().add(textContent);
+        }
 
         Node gambar = buatAreaGambar(response);
         if (gambar != null) {
@@ -184,6 +182,124 @@ public class UserDashboardController {
         }
 
         return bubble;
+    }
+
+    private Node buatKontenTeksBot(ChatResponse response) {
+        VBox content = new VBox(8);
+        content.prefWidthProperty().bind(chatScroll.widthProperty().multiply(0.66));
+        content.maxWidthProperty().bind(chatScroll.widthProperty().multiply(0.66));
+        content.getStyleClass().add("bot-formatted-content");
+
+        if (response.hasBlocks()) {
+            for (ChatBlock block : response.getBlocks()) {
+                Node node = buatNodeBlock(block);
+                if (node != null) {
+                    content.getChildren().add(node);
+                }
+            }
+        } else if (response.getText() != null && !response.getText().isBlank()) {
+            content.getChildren().add(buatLabelTeksBot(response.getText(), "bubble-bot-text"));
+        }
+
+        return content.getChildren().isEmpty() ? null : content;
+    }
+
+    private Node buatNodeBlock(ChatBlock block) {
+        if (block == null) {
+            return null;
+        }
+
+        switch (block.getType()) {
+            case TITLE:
+                return buatLabelTeksBot(block.getTitle(), "chat-block-title");
+            case SECTION:
+                return buatLabelTeksBot(block.getTitle(), "chat-block-section");
+            case PARAGRAPH:
+                return buatLabelTeksBot(block.getTitle(), "chat-block-paragraph");
+            case NOTE:
+                return buatLabelTeksBot(block.getTitle(), "chat-block-note");
+            case DETAIL_ROW:
+                return buatDetailRow(block);
+            case NUMBERED_ITEM:
+                return buatNumberedItem(block);
+            case NUMBERED_DETAIL_ITEM:
+                return buatNumberedDetailItem(block);
+            case LIST_ITEM:
+                return buatListItem(block);
+            default:
+                return null;
+        }
+    }
+
+    private Node buatDetailRow(ChatBlock block) {
+        Label label = new Label(block.getTitle());
+        label.setMinWidth(76);
+        label.setMaxWidth(92);
+        label.getStyleClass().add("chat-detail-label");
+
+        Label value = buatLabelTeksBot(block.getValue(), "chat-detail-value");
+        HBox.setHgrow(value, Priority.ALWAYS);
+
+        HBox row = new HBox(10, label, value);
+        row.setAlignment(Pos.TOP_LEFT);
+        row.getStyleClass().add("chat-detail-row");
+        return row;
+    }
+
+    private Node buatNumberedItem(ChatBlock block) {
+        Label title = buatLabelTeksBot(block.getTitle(), "chat-numbered-title");
+        Label value = buatLabelTeksBot(block.getValue(), "chat-numbered-value");
+
+        HBox row = new HBox(10, title, value);
+        row.setAlignment(Pos.TOP_LEFT);
+        HBox.setHgrow(title, Priority.ALWAYS);
+        row.getStyleClass().add("chat-numbered-item");
+        return row;
+    }
+
+    private Node buatNumberedDetailItem(ChatBlock block) {
+        Label title = buatLabelTeksBot(block.getTitle(), "chat-numbered-detail-title");
+        Label value = buatLabelTeksBot(block.getValue(), "chat-numbered-detail-value");
+
+        VBox item = new VBox(3, title);
+        if (block.getValue() != null && !block.getValue().isBlank()) {
+            item.getChildren().add(value);
+        }
+        item.getStyleClass().add("chat-numbered-detail-item");
+        return item;
+    }
+
+    private Node buatListItem(ChatBlock block) {
+        Label marker = new Label("-");
+        marker.setMinSize(18, 18);
+        marker.setPrefSize(18, 18);
+        marker.setMaxSize(18, 18);
+        marker.setAlignment(Pos.CENTER);
+        marker.getStyleClass().add("chat-list-marker");
+
+        Label title = buatLabelTeksBot(block.getTitle(), "chat-list-title");
+        Label value = buatLabelTeksBot(block.getValue(), "chat-list-value");
+
+        VBox text = new VBox(2, title);
+        if (block.getValue() != null && !block.getValue().isBlank()) {
+            text.getChildren().add(value);
+        }
+        HBox.setHgrow(text, Priority.ALWAYS);
+
+        HBox item = new HBox(8, marker, text);
+        item.setAlignment(Pos.TOP_LEFT);
+        item.getStyleClass().add("chat-list-item");
+        return item;
+    }
+
+    private Label buatLabelTeksBot(String pesan, String styleClass) {
+        Label label = new Label(pesan == null ? "" : pesan);
+        label.setWrapText(true);
+        label.setTextOverrun(OverrunStyle.CLIP);
+        label.setMinHeight(Region.USE_PREF_SIZE);
+        label.maxWidthProperty().bind(chatScroll.widthProperty().multiply(0.62));
+        label.getStyleClass().add(styleClass);
+        return label;
     }
 
     private Node buatAreaGambar(ChatResponse response) {

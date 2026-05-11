@@ -334,6 +334,10 @@
     -fx-border-radius: 10;
 }
 
+.menu-table-thumbnail {
+    -fx-effect: dropshadow(gaussian, rgba(91, 63, 49, 0.16), 5, 0.12, 0, 1);
+}
+
 .menu-card-tag {
     -fx-background-color: #F3EBE3;
     -fx-background-radius: 20;
@@ -367,6 +371,32 @@
 .settings-check {
     -fx-text-fill: #5F4C40;
     -fx-font-size: 13;
+}
+
+.image-drop-zone {
+    -fx-background-color: #F8F1EA;
+    -fx-background-radius: 12;
+    -fx-border-color: #D8C7BC;
+    -fx-border-radius: 12;
+    -fx-border-style: segments(8, 6);
+    -fx-padding: 10;
+    -fx-cursor: hand;
+}
+
+.image-drop-zone:hover,
+.image-drop-zone-active {
+    -fx-background-color: #F1E4D8;
+    -fx-border-color: -fx-primary;
+}
+
+.image-preview {
+    -fx-effect: dropshadow(gaussian, rgba(91, 63, 49, 0.18), 8, 0.15, 0, 2);
+}
+
+.image-drop-label {
+    -fx-font-size: 11;
+    -fx-text-fill: #7B6457;
+    -fx-font-weight: bold;
 }
 
 .table-placeholder {

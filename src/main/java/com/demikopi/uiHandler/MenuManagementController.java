@@ -13,10 +13,24 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
+import javafx.scene.layout.StackPane;
+import javafx.stage.FileChooser;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.Locale;
 
 /**
  * Controller khusus halaman Manajemen Menu.
@@ -24,6 +38,10 @@ import javafx.scene.control.TextField;
  */
 public class MenuManagementController extends AdminNavigationController {
 
+    private static final Path MENU_IMAGE_DIRECTORY = Path.of(
+            "src", "main", "resources", "com", "demikopi", "uiHandler", "asset", "menu"
+    );
+    private static final String MENU_IMAGE_DB_PREFIX = "asset/menu/";
     private static final String FILTER_SEMUA = "Semua";
     private static final String FILTER_TERSEDIA = "Tersedia";
     private static final String FILTER_HABIS = "Habis";
@@ -36,6 +54,9 @@ public class MenuManagementController extends AdminNavigationController {
 
     @FXML
     private TableView<Menu> menuTable;
+
+    @FXML
+    private TableColumn<Menu, String> gambarColumn;
 
     @FXML
     private TableColumn<Menu, String> namaMenuColumn;
@@ -80,6 +101,15 @@ public class MenuManagementController extends AdminNavigationController {
     private TextField imagePathInput;
 
     @FXML
+    private StackPane imageDropZone;
+
+    @FXML
+    private ImageView imagePreview;
+
+    @FXML
+    private Label imageDropLabel;
+
+    @FXML
     private CheckBox bestsellerCheck;
 
     @FXML
@@ -95,6 +125,7 @@ public class MenuManagementController extends AdminNavigationController {
     private void initialize() {
         siapkanKolomTabelMenu();
         siapkanFilterMenu();
+        siapkanInputGambar();
         loadKategoriMenu();
         loadMenuData();
 
@@ -184,6 +215,40 @@ public class MenuManagementController extends AdminNavigationController {
     }
 
     private void siapkanKolomTabelMenu() {
+        gambarColumn.setCellValueFactory(data -> new SimpleStringProperty(aman(data.getValue().getImagePath())));
+        gambarColumn.setCellFactory(column -> new TableCell<>() {
+            private final ImageView thumbnail = new ImageView();
+
+            {
+                thumbnail.setFitWidth(46);
+                thumbnail.setFitHeight(34);
+                thumbnail.setPreserveRatio(true);
+                thumbnail.setSmooth(true);
+                thumbnail.getStyleClass().add("menu-table-thumbnail");
+            }
+
+            @Override
+            protected void updateItem(String imagePath, boolean empty) {
+                super.updateItem(imagePath, empty);
+                if (empty) {
+                    setGraphic(null);
+                    setText(null);
+                    return;
+                }
+
+                String source = resolvePreviewImageSource(imagePath);
+                if (source == null) {
+                    setGraphic(null);
+                    setText("-");
+                    return;
+                }
+
+                thumbnail.setImage(new Image(source, true));
+                setGraphic(thumbnail);
+                setText(null);
+            }
+        });
+
         namaMenuColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getNamaMenu()));
         kategoriColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getKategori()));
         hargaColumn.setCellValueFactory(data -> new SimpleStringProperty(formatRupiah(data.getValue().getHarga())));
@@ -203,6 +268,42 @@ public class MenuManagementController extends AdminNavigationController {
                 FILTER_BESTSELLER
         ));
         statusFilterInput.getSelectionModel().select(FILTER_SEMUA);
+    }
+
+    private void siapkanInputGambar() {
+        imageDropZone.setOnMouseClicked(event -> pilihGambarMenu());
+
+        imageDropZone.setOnDragOver(event -> {
+            Dragboard dragboard = event.getDragboard();
+            if (dragboard.hasFiles() && fileGambarValid(dragboard.getFiles().get(0))) {
+                event.acceptTransferModes(TransferMode.COPY);
+            }
+            event.consume();
+        });
+
+        imageDropZone.setOnDragEntered(event -> {
+            Dragboard dragboard = event.getDragboard();
+            if (dragboard.hasFiles() && fileGambarValid(dragboard.getFiles().get(0))) {
+                imageDropZone.getStyleClass().add("image-drop-zone-active");
+            }
+            event.consume();
+        });
+
+        imageDropZone.setOnDragExited(event -> {
+            imageDropZone.getStyleClass().remove("image-drop-zone-active");
+            event.consume();
+        });
+
+        imageDropZone.setOnDragDropped(event -> {
+            Dragboard dragboard = event.getDragboard();
+            boolean berhasil = false;
+            if (dragboard.hasFiles()) {
+                berhasil = prosesGambarMenu(dragboard.getFiles().get(0));
+            }
+            imageDropZone.getStyleClass().remove("image-drop-zone-active");
+            event.setDropCompleted(berhasil);
+            event.consume();
+        });
     }
 
     private void loadKategoriMenu() {
@@ -286,6 +387,7 @@ public class MenuManagementController extends AdminNavigationController {
         hargaInput.setText(String.valueOf(menu.getHarga()));
         deskripsiInput.setText(aman(menu.getDeskripsiMenu()));
         imagePathInput.setText(aman(menu.getImagePath()));
+        tampilkanPreviewGambar(menu.getImagePath());
         bestsellerCheck.setSelected(menu.isBestseller());
         tersediaCheck.setSelected(menu.isStatusTersedia());
     }
@@ -353,6 +455,7 @@ public class MenuManagementController extends AdminNavigationController {
         hargaInput.clear();
         deskripsiInput.clear();
         imagePathInput.clear();
+        resetPreviewGambar();
         bestsellerCheck.setSelected(false);
         tersediaCheck.setSelected(true);
 
@@ -379,6 +482,131 @@ public class MenuManagementController extends AdminNavigationController {
 
     private String kosongJadiNull(String value) {
         return value == null || value.isBlank() ? null : value;
+    }
+
+    private void pilihGambarMenu() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Pilih Gambar Menu");
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
+                "File gambar", "*.jpg", "*.jpeg", "*.png"
+        ));
+
+        File file = chooser.showOpenDialog(imageDropZone.getScene().getWindow());
+        if (file != null) {
+            prosesGambarMenu(file);
+        }
+    }
+
+    private boolean prosesGambarMenu(File file) {
+        if (!fileGambarValid(file)) {
+            showAlert(Alert.AlertType.WARNING, "Gambar tidak valid", "Gunakan file gambar JPG, JPEG, atau PNG.");
+            return false;
+        }
+
+        try {
+            Files.createDirectories(MENU_IMAGE_DIRECTORY);
+
+            Path sumber = file.toPath();
+            Path target = buatTargetGambar(sumber);
+            Files.copy(sumber, target, StandardCopyOption.REPLACE_EXISTING);
+
+            String dbPath = MENU_IMAGE_DB_PREFIX + target.getFileName();
+            imagePathInput.setText(dbPath);
+            tampilkanPreviewGambar(dbPath);
+            return true;
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Gagal menyimpan gambar", "Gambar tidak bisa disalin: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private Path buatTargetGambar(Path sumber) {
+        String extension = ambilExtension(sumber.getFileName().toString());
+        String namaDasar = slug(ambilText(namaMenuInput));
+        if (namaDasar.isEmpty()) {
+            namaDasar = slug(hapusExtension(sumber.getFileName().toString()));
+        }
+        if (namaDasar.isEmpty()) {
+            namaDasar = "menu";
+        }
+
+        Path target = MENU_IMAGE_DIRECTORY.resolve(namaDasar + extension);
+        int index = 2;
+        while (Files.exists(target)) {
+            target = MENU_IMAGE_DIRECTORY.resolve(namaDasar + "-" + index + extension);
+            index++;
+        }
+        return target;
+    }
+
+    private boolean fileGambarValid(File file) {
+        if (file == null || !file.isFile()) {
+            return false;
+        }
+
+        String name = file.getName().toLowerCase(Locale.ROOT);
+        return name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png");
+    }
+
+    private void tampilkanPreviewGambar(String imagePath) {
+        String source = resolvePreviewImageSource(imagePath);
+        if (source == null) {
+            resetPreviewGambar();
+            return;
+        }
+
+        imagePreview.setImage(new Image(source, true));
+        imageDropLabel.setText("Gambar siap digunakan");
+    }
+
+    private void resetPreviewGambar() {
+        imagePreview.setImage(null);
+        imageDropLabel.setText("Drop gambar menu di sini atau klik untuk pilih");
+    }
+
+    private String resolvePreviewImageSource(String imagePath) {
+        if (imagePath == null || imagePath.isBlank()) {
+            return null;
+        }
+
+        String trimmedPath = imagePath.trim();
+        if (trimmedPath.startsWith("file:") || trimmedPath.startsWith("http://") || trimmedPath.startsWith("https://")) {
+            return trimmedPath;
+        }
+
+        Path filePath = trimmedPath.startsWith(MENU_IMAGE_DB_PREFIX)
+                ? MENU_IMAGE_DIRECTORY.resolve(trimmedPath.substring(MENU_IMAGE_DB_PREFIX.length()))
+                : Path.of(trimmedPath);
+
+        if (!filePath.isAbsolute()) {
+            filePath = Path.of("").toAbsolutePath().resolve(filePath);
+        }
+
+        return Files.isRegularFile(filePath) ? filePath.toUri().toString() : null;
+    }
+
+    private String ambilExtension(String fileName) {
+        int dotIndex = fileName.lastIndexOf('.');
+        if (dotIndex < 0 || dotIndex == fileName.length() - 1) {
+            return ".jpg";
+        }
+        return fileName.substring(dotIndex).toLowerCase(Locale.ROOT);
+    }
+
+    private String hapusExtension(String fileName) {
+        int dotIndex = fileName.lastIndexOf('.');
+        return dotIndex < 0 ? fileName : fileName.substring(0, dotIndex);
+    }
+
+    private String slug(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.toLowerCase(Locale.ROOT)
+                .replaceAll("[^a-z0-9\\s-]", "")
+                .replaceAll("\\s+", "-")
+                .replaceAll("-+", "-")
+                .replaceAll("^-|-$", "");
     }
 
     private String formatRupiah(int harga) {

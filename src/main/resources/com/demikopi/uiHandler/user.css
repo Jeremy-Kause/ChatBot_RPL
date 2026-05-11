@@ -72,6 +72,121 @@
 
 .bubble-bot-text {
     -fx-text-fill: -fx-text-dark;
+    -fx-line-spacing: 2;
+}
+
+.bot-formatted-content {
+    -fx-fill-width: true;
+}
+
+.chat-block-title {
+    -fx-font-size: 15;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-dark;
+    -fx-line-spacing: 2;
+}
+
+.chat-block-section {
+    -fx-background-color: #EFE6DC;
+    -fx-background-radius: 6;
+    -fx-padding: 5 8;
+    -fx-font-size: 11;
+    -fx-font-weight: bold;
+    -fx-text-fill: #6E594D;
+}
+
+.chat-block-paragraph {
+    -fx-font-size: 12.5;
+    -fx-text-fill: -fx-text-dark;
+    -fx-line-spacing: 2;
+}
+
+.chat-block-note {
+    -fx-background-color: #FFF8E8;
+    -fx-background-radius: 8;
+    -fx-border-color: #E8D19A;
+    -fx-border-radius: 8;
+    -fx-padding: 8 10;
+    -fx-font-size: 12.5;
+    -fx-text-fill: #5F4D2D;
+    -fx-line-spacing: 2;
+}
+
+.chat-detail-row {
+    -fx-background-color: #F8F3ED;
+    -fx-background-radius: 8;
+    -fx-padding: 7 9;
+}
+
+.chat-detail-label {
+    -fx-font-size: 11.5;
+    -fx-font-weight: bold;
+    -fx-text-fill: #7B6A60;
+}
+
+.chat-detail-value {
+    -fx-font-size: 12.5;
+    -fx-text-fill: -fx-text-dark;
+    -fx-line-spacing: 2;
+}
+
+.chat-numbered-item {
+    -fx-padding: 2 0 2 0;
+}
+
+.chat-numbered-title {
+    -fx-font-size: 12.5;
+    -fx-text-fill: -fx-text-dark;
+}
+
+.chat-numbered-value {
+    -fx-font-size: 12.5;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-primary;
+}
+
+.chat-numbered-detail-item {
+    -fx-padding: 5 0 7 0;
+}
+
+.chat-numbered-detail-title {
+    -fx-font-size: 12.5;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-dark;
+}
+
+.chat-numbered-detail-value {
+    -fx-font-size: 12;
+    -fx-text-fill: #7B6A60;
+    -fx-line-spacing: 2;
+}
+
+.chat-list-item {
+    -fx-background-color: #FBF8F4;
+    -fx-background-radius: 8;
+    -fx-border-color: #EFE6DC;
+    -fx-border-radius: 8;
+    -fx-padding: 7 9;
+}
+
+.chat-list-marker {
+    -fx-background-color: -fx-primary;
+    -fx-background-radius: 9;
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.chat-list-title {
+    -fx-font-size: 12.5;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-dark;
+}
+
+.chat-list-value {
+    -fx-font-size: 11.5;
+    -fx-text-fill: #7B6A60;
+    -fx-line-spacing: 2;
 }
 
 .bubble-user {

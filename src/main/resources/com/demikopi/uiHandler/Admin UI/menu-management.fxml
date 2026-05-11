@@ -84,7 +84,8 @@
 
                     <TableView fx:id="menuTable" styleClass="menu-table" VBox.vgrow="ALWAYS">
                         <columns>
-                            <TableColumn fx:id="namaMenuColumn" prefWidth="145.0" text="Nama Menu" />
+                            <TableColumn fx:id="gambarColumn" prefWidth="66.0" text="Gambar" />
+                            <TableColumn fx:id="namaMenuColumn" prefWidth="125.0" text="Nama Menu" />
                             <TableColumn fx:id="kategoriColumn" prefWidth="75.0" text="Kategori" />
                             <TableColumn fx:id="hargaColumn" prefWidth="80.0" text="Harga" />
                             <TableColumn fx:id="statusColumn" prefWidth="70.0" text="Status" />
@@ -134,7 +135,13 @@
 
                             <VBox spacing="5.0">
                                 <Label styleClass="form-label" text="Path Gambar" />
-                                <TextField fx:id="imagePathInput" promptText="asset/menu/caramel-macchiato.jpg" styleClass="settings-field" />
+                                <StackPane fx:id="imageDropZone" prefHeight="118.0" styleClass="image-drop-zone">
+                                    <VBox alignment="CENTER" spacing="6.0">
+                                        <ImageView fx:id="imagePreview" fitHeight="64.0" fitWidth="120.0" preserveRatio="true" styleClass="image-preview" />
+                                        <Label fx:id="imageDropLabel" alignment="CENTER" styleClass="image-drop-label" text="Drop gambar menu di sini atau klik untuk pilih" textAlignment="CENTER" wrapText="true" />
+                                    </VBox>
+                                </StackPane>
+                                <TextField fx:id="imagePathInput" editable="false" promptText="asset/menu/caramel-macchiato.jpg" styleClass="settings-field" />
                             </VBox>
 
                             <HBox alignment="CENTER_LEFT" spacing="10.0">
