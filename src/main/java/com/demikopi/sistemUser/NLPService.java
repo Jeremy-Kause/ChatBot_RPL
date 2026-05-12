@@ -1,27 +1,77 @@
 package com.demikopi.sistemUser;
 
+import java.util.regex.Pattern;
+
 /**
  * NLPService memproses input user menjadi intent dan keyword.
  * Algoritma masih rule-based, yaitu pencocokan kata kunci dari teks yang sudah dibersihkan.
  */
 public class NLPService {
 
-    private static final String[] KAMUS_SALAM = {"halo", "hi", "hey", "hai", "pagi", "siang", "sore", "malam"};
-    private static final String[] KAMUS_JAM = {"jam", "buka", "tutup", "operasional"};
-    private static final String[] KAMUS_LOKASI = {"lokasi", "alamat", "di mana", "dimana"};
-    private static final String[] KAMUS_FASILITAS = {"fasilitas", "wifi", "parkir", "colokan", "mushola", "musholla"};
-    private static final String[] KAMUS_DETAIL = {"tentang", "detail", "info", "deskripsi", "harga"};
+    private static final String[] KAMUS_SALAM = {
+            "halo", "hi", "hey", "hai", "hello", "hallo", "pagi", "siang", "sore", "malam",
+            "selamat", "permisi", "assalamualaikum", "assalamu alaikum", "assalam", "morning"
+    };
+    private static final String[] KAMUS_JAM = {
+            "jam", "buka", "tutup", "operasional", "jadwal", "jam buka", "jam tutup",
+            "open", "close", "opening", "closing", "masih buka", "sudah tutup", "kapan buka"
+    };
+    private static final String[] KAMUS_LOKASI = {
+            "lokasi", "alamat", "di mana", "dimana", "tempat", "posisi", "maps", "map",
+            "google maps", "arah", "rute", "cabang", "patokan"
+    };
+    private static final String[] KAMUS_FASILITAS = {
+            "fasilitas", "wifi", "wi-fi", "parkir", "colokan", "stop kontak", "charger",
+            "charging", "mushola", "musholla", "toilet", "kamar mandi", "ac", "indoor",
+            "outdoor", "smoking", "smoking area"
+    };
+    private static final String[] KAMUS_DETAIL = {
+            "tentang", "detail", "info", "informasi", "deskripsi", "harga", "harganya",
+            "berapa", "berapaan", "komposisi", "bahan", "isi", "ukuran", "porsi"
+    };
     private static final String[] KAMUS_REKOMENDASI = {
             "rekomen", "rekomendasi", "saran", "enak", "bagus", "favorit",
-            "bestseller", "best seller", "best-seller", "terlaris", "paling laku", "unggulan"
+            "bestseller", "best seller", "best-seller", "terlaris", "paling laku", "unggulan",
+            "recommended", "recommend", "rekomendasiin", "saranin", "pilihan", "pilihin",
+            "cocok", "mantap", "favoritnya", "andalan", "populer", "viral", "hits",
+            "signature", "spesial", "best", "top", "paling enak", "yang enak"
     };
     private static final String[] KAMUS_BESTSELLER = {
-            "bestseller", "best seller", "best-seller", "terlaris", "paling laku", "favorit", "unggulan"
+            "bestseller", "best seller", "best-seller", "terlaris", "paling laku", "favorit",
+            "favoritnya", "unggulan", "andalan", "populer", "viral", "hits", "signature",
+            "best", "top", "paling enak", "yang enak"
     };
-    private static final String[] KAMUS_RASA = {"manis", "pahit", "asam", "gurih", "creamy", "fruity", "segar"};
-    private static final String[] KAMUS_SUHU = {"panas", "dingin", "iced", "hot"};
-    private static final String[] KAMUS_MENU = {"menu", "daftar", "ada apa aja", "list"};
-    private static final String[] KAMUS_KATEGORI = {"non-kopi", "non kopi", "kopi", "makanan", "minuman", "mix"};
+    private static final String[] KAMUS_RASA = {
+            "manis", "sweet", "gula", "pahit", "bold", "strong", "asam", "acid", "acidic",
+            "gurih", "savory", "asin", "creamy", "cream", "milky", "susu", "fruity",
+            "buah", "segar", "fresh", "ringan"
+    };
+    private static final String[] KAMUS_SUHU = {
+            "panas", "hangat", "hot", "warm", "dingin", "iced", "ice", "es", "cold",
+            "sejuk", "gerah"
+    };
+    private static final String[] KAMUS_MENU = {
+            "menu", "daftar", "ada apa aja", "list", "katalog", "pilihan menu", "menunya",
+            "jual apa", "tersedia apa"
+    };
+    private static final String[] KAMUS_KATEGORI = {
+            "non-kopi", "non kopi", "tanpa kopi", "selain kopi", "kopi", "coffee", "makanan",
+            "cemilan", "snack", "makan", "minuman", "drink", "beverage", "mix"
+    };
+
+    private static final String[][] ALIAS_RASA = {
+            {"manis", "manis", "sweet", "gula"},
+            {"pahit", "pahit", "bold", "strong"},
+            {"asam", "asam", "acid", "acidic"},
+            {"gurih", "gurih", "savory", "asin"},
+            {"creamy", "creamy", "cream", "milky", "susu"},
+            {"fruity", "fruity", "buah"},
+            {"segar", "segar", "fresh", "ringan"}
+    };
+    private static final String[][] ALIAS_SUHU = {
+            {"panas", "panas", "hangat", "hot", "warm"},
+            {"dingin", "dingin", "iced", "ice", "es", "cold", "sejuk", "gerah"}
+    };
 
     private String inputUser;
     private String processedInput;
@@ -63,9 +113,9 @@ public class NLPService {
         } else if (containsAny(KAMUS_FASILITAS)) {
             return Intent.TANYA_FASILITAS;
         } else if (containsAny(KAMUS_REKOMENDASI)
-                || containsAny(KAMUS_RASA)
-                || containsAny(KAMUS_SUHU)
-                || processedInput.matches(".*\\b(pengen|mau|pesen|pesan|cari)\\b.*\\byang\\b.*")) {
+                || containsAnyAlias(ALIAS_RASA)
+                || containsAnyAlias(ALIAS_SUHU)
+                || processedInput.matches(".*\\b(pengen|pengin|mau|ingin|pesen|pesan|beli|cari|nyari)\\b.*\\byang\\b.*")) {
             return Intent.TANYA_REKOMENDASI;
         } else if (containsAny(KAMUS_DETAIL)) {
             return Intent.TANYA_DETAIL_MENU;
@@ -88,13 +138,23 @@ public class NLPService {
                 String extractedKategori = null;
 
                 // Konteks kategori rekomendasi.
-                if (processedInput.contains("makanan") || processedInput.contains("cemilan") || processedInput.contains("ngemil") || processedInput.contains("makan")) {
+                if (processedInput.contains("makanan")
+                        || processedInput.contains("cemilan")
+                        || processedInput.contains("snack")
+                        || processedInput.contains("ngemil")
+                        || processedInput.contains("makan")) {
                     extractedKategori = "makanan";
-                } else if (processedInput.contains("non-kopi") || processedInput.contains("non kopi") || processedInput.contains("selain kopi")) {
+                } else if (processedInput.contains("non-kopi")
+                        || processedInput.contains("non kopi")
+                        || processedInput.contains("tanpa kopi")
+                        || processedInput.contains("selain kopi")) {
                     extractedKategori = "non-kopi";
-                } else if (processedInput.contains("kopi")) {
+                } else if (processedInput.contains("kopi") || processedInput.contains("coffee")) {
                     extractedKategori = "kopi";
-                } else if (processedInput.contains("minuman") || processedInput.contains("minum")) {
+                } else if (processedInput.contains("minuman")
+                        || processedInput.contains("minum")
+                        || processedInput.contains("drink")
+                        || processedInput.contains("beverage")) {
                     extractedKategori = "minuman";
                 }
 
@@ -105,22 +165,12 @@ public class NLPService {
 
                 // Kriteria rasa.
                 if (extractedKriteria == null) {
-                    for (String r : KAMUS_RASA) {
-                        if (processedInput.contains(r)) {
-                            extractedKriteria = r;
-                            break;
-                        }
-                    }
+                    extractedKriteria = findCanonicalAlias(ALIAS_RASA);
                 }
 
                 // Kriteria suhu.
                 if (extractedKriteria == null) {
-                    for (String s : KAMUS_SUHU) {
-                        if (processedInput.contains(s)) {
-                            extractedKriteria = s;
-                            break;
-                        }
-                    }
+                    extractedKriteria = extractSuhuContext();
                 }
 
                 if (extractedKategori == null && extractedKriteria == null) {
@@ -129,8 +179,25 @@ public class NLPService {
                 return (extractedKategori != null ? extractedKategori : "") + "|" + (extractedKriteria != null ? extractedKriteria : "");
 
             case TANYA_KATEGORI:
-                if (processedInput.contains("non-kopi") || processedInput.contains("non kopi")) {
+                if (processedInput.contains("non-kopi")
+                        || processedInput.contains("non kopi")
+                        || processedInput.contains("tanpa kopi")
+                        || processedInput.contains("selain kopi")) {
                     return "non-kopi";
+                }
+
+                if (processedInput.contains("cemilan")
+                        || processedInput.contains("snack")
+                        || processedInput.contains("makan")) {
+                    return "makanan";
+                }
+
+                if (processedInput.contains("drink") || processedInput.contains("beverage")) {
+                    return "minuman";
+                }
+
+                if (processedInput.contains("coffee")) {
+                    return "kopi";
                 }
 
                 String[] kategori = {"kopi", "makanan", "minuman", "mix"};
@@ -143,7 +210,10 @@ public class NLPService {
 
             case TANYA_DETAIL_MENU:
                 String entity = processedInput;
-                String[] triggers = {"tentang ", "detail ", "info ", "deskripsi ", "harga "};
+                String[] triggers = {
+                        "tentang ", "detail ", "info ", "informasi ", "deskripsi ", "harga ",
+                        "harganya ", "komposisi ", "bahan ", "isi ", "ukuran ", "porsi "
+                };
 
                 for (String t : triggers) {
                     if (entity.contains(t)) {
@@ -168,7 +238,7 @@ public class NLPService {
 
     private boolean containsAny(String[] kamus) {
         for (String kata : kamus) {
-            if (processedInput.contains(kata)) {
+            if (containsKeyword(kata)) {
                 return true;
             }
         }
@@ -177,10 +247,37 @@ public class NLPService {
 
     private boolean containsAnyWord(String[] kamus) {
         for (String kata : kamus) {
-            if (processedInput.matches(".*\\b" + kata + "\\b.*")) {
+            if (containsKeyword(kata)) {
                 return true;
             }
         }
         return false;
+    }
+
+    private String findCanonicalAlias(String[][] aliasGroups) {
+        for (String[] aliasGroup : aliasGroups) {
+            String canonical = aliasGroup[0];
+            for (int i = 1; i < aliasGroup.length; i++) {
+                if (containsKeyword(aliasGroup[i])) {
+                    return canonical;
+                }
+            }
+        }
+        return null;
+    }
+
+    private boolean containsAnyAlias(String[][] aliasGroups) {
+        return findCanonicalAlias(aliasGroups) != null;
+    }
+
+    private String extractSuhuContext() {
+        if (processedInput.matches(".*\\b(cuaca|hari|udara)\\b.*\\b(panas|gerah)\\b.*")) {
+            return "dingin";
+        }
+        return findCanonicalAlias(ALIAS_SUHU);
+    }
+
+    private boolean containsKeyword(String keyword) {
+        return processedInput.matches(".*\\b" + Pattern.quote(keyword) + "\\b.*");
     }
 }
