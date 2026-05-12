@@ -26,5 +26,18 @@ public class AdminDAO extends DatabaseConfig {
         }
         return null;
     }
+
+    public boolean updatePassword(String username, String passwordBaru) {
+        pastikanKoneksiTersedia();
+
+        String query = "UPDATE admin SET password = ? WHERE username = ?";
+        try (PreparedStatement myStmt = conn.prepareStatement(query)) {
+            myStmt.setString(1, passwordBaru);
+            myStmt.setString(2, username);
+            return myStmt.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new IllegalStateException("Gagal mengubah password admin: " + e.getMessage(), e);
+        }
+    }
 }
 // Done

@@ -23,6 +23,9 @@ import java.util.stream.Collectors;
  */
 public class ChatEngine {
 
+    private static final int BATAS_REKOMENDASI = 3;
+    private static final int BATAS_BESTSELLER = 10;
+
     private final MenuDAO menuDAO;
     private final InfoDAO infoDAO;
     private final FasilitasDAO fasilitasDAO;
@@ -203,10 +206,34 @@ public class ChatEngine {
 
     private ChatResponse buildChatResponseRekomendasi(String keyword) {
         List<Menu> menus = ambilMenuTersedia();
-        String responseText = rekomendasi.getRekomendasi(keyword, menus);
-        List<Menu> menuRekomendasi = rekomendasi.getMenuRekomendasi(keyword, menus, 0);
+
+        if (permintaanBestseller(keyword)) {
+            return buildChatResponseBestseller(keyword, menus);
+        }
+
+        String responseText = rekomendasi.getRekomendasi(keyword, menus, BATAS_REKOMENDASI);
+        List<Menu> menuRekomendasi = rekomendasi.getMenuRekomendasi(keyword, menus, BATAS_REKOMENDASI);
         List<ChatBlock> blocks = buildBlocksRekomendasi(responseText, menuRekomendasi);
         List<ChatResponse.ChatImage> images = menuRekomendasi.stream()
+                .map(menu -> new ChatResponse.ChatImage(
+                        menu.getNamaMenu(),
+                        isiAtauStrip(menu.getKategori()) + " - " + formatRupiah(menu.getHarga()),
+                        imagePathMenu(menu)
+                ))
+                .filter(image -> image.getImagePath() != null && !image.getImagePath().isBlank())
+                .collect(Collectors.toList());
+
+        if (images.isEmpty()) {
+            return ChatResponse.formatted(responseText, blocks);
+        }
+        return ChatResponse.withImages(responseText, images, blocks);
+    }
+
+    private ChatResponse buildChatResponseBestseller(String keyword, List<Menu> menus) {
+        List<Menu> menuBestseller = rekomendasi.getMenuRekomendasi(keyword, menus, BATAS_BESTSELLER);
+        String responseText = "Top 10 best seller DEMIKOPI";
+        List<ChatBlock> blocks = List.of(ChatBlock.title(responseText));
+        List<ChatResponse.ChatImage> images = menuBestseller.stream()
                 .map(menu -> new ChatResponse.ChatImage(
                         menu.getNamaMenu(),
                         isiAtauStrip(menu.getKategori()) + " - " + formatRupiah(menu.getHarga()),
@@ -274,10 +301,15 @@ public class ChatEngine {
         }
 
         InfoKedai info = ambilInfoKedai();
-        return ChatResponse.formatted(text, List.of(
-                ChatBlock.title("Jam buka DEMIKOPI"),
-                ChatBlock.detailRow("Jadwal", info == null ? "-" : isiAtauStrip(info.getJamOperasional()))
-        ));
+        List<ChatBlock> blocks = new ArrayList<>();
+        blocks.add(ChatBlock.title("Jam buka DEMIKOPI"));
+        blocks.add(ChatBlock.section("Jadwal"));
+
+        for (String jadwal : pecahJadwalOperasional(info == null ? null : info.getJamOperasional())) {
+            blocks.add(buatBlockJadwal(jadwal));
+        }
+
+        return ChatResponse.formatted(text, blocks);
     }
 
     private String buildResponseJamBuka() {
@@ -285,7 +317,44 @@ public class ChatEngine {
         if (info == null || info.getJamOperasional() == null || info.getJamOperasional().isBlank()) {
             return "Maaf, informasi jam buka belum diatur.";
         }
-        return "DEMIKOPI buka dengan jadwal berikut:\n" + info.getJamOperasional();
+
+        StringBuilder sb = new StringBuilder("DEMIKOPI buka dengan jadwal berikut:\n");
+        for (String jadwal : pecahJadwalOperasional(info.getJamOperasional())) {
+            sb.append(jadwal).append("\n");
+        }
+        return sb.toString().trim();
+    }
+
+    private List<String> pecahJadwalOperasional(String jamOperasional) {
+        if (jamOperasional == null || jamOperasional.isBlank()) {
+            return List.of("-");
+        }
+
+        List<String> hasil = new ArrayList<>();
+        String[] jadwalParts = jamOperasional.split("\\|");
+        for (String jadwal : jadwalParts) {
+            String jadwalBersih = jadwal.trim();
+            if (!jadwalBersih.isEmpty()) {
+                hasil.add(jadwalBersih);
+            }
+        }
+
+        return hasil.isEmpty() ? List.of("-") : hasil;
+    }
+
+    private ChatBlock buatBlockJadwal(String jadwal) {
+        if (jadwal == null || jadwal.isBlank()) {
+            return ChatBlock.scheduleRow("-", "");
+        }
+
+        int pemisah = jadwal.indexOf(":");
+        if (pemisah <= 0 || pemisah == jadwal.length() - 1) {
+            return ChatBlock.scheduleRow(jadwal.trim(), "");
+        }
+
+        String hari = jadwal.substring(0, pemisah).trim();
+        String jam = jadwal.substring(pemisah + 1).trim();
+        return ChatBlock.scheduleRow(hari, jam);
     }
 
     private ChatResponse buildChatResponseLokasi() {
@@ -449,6 +518,21 @@ public class ChatEngine {
             return kategori.equals("kopi") || kategori.equals("non-kopi") || kategori.equals("mix");
         }
         return kategori.equals(dicari);
+    }
+
+    private boolean permintaanBestseller(String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return true;
+        }
+
+        String keywordLower = keyword.toLowerCase(Locale.ROOT);
+        return keywordLower.contains("bestseller")
+                || keywordLower.contains("best seller")
+                || keywordLower.contains("best-seller")
+                || keywordLower.contains("terlaris")
+                || keywordLower.contains("paling laku")
+                || keywordLower.contains("favorit")
+                || keywordLower.contains("unggulan");
     }
 
     private String isiAtauStrip(String value) {

@@ -40,7 +40,10 @@
                 <Label fx:id="labelStatus" styleClass="assistant-status" text="Online | Siap melayani pesanan Anda"/>
             </VBox>
 
-            <Button onAction="#handleClearChat" styleClass="clear-button" text="Clear Chat"/>
+            <HBox alignment="CENTER_RIGHT" spacing="8">
+                <Button onAction="#handleClearChat" styleClass="clear-button" text="Clear Chat"/>
+                <Button fx:id="adminLoginButton" onAction="#handleLoginAdmin" styleClass="admin-login-button" text="Login Admin"/>
+            </HBox>
         </HBox>
     </top>
 

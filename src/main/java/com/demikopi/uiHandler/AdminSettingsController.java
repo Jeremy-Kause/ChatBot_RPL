@@ -1,138 +1,136 @@
 package com.demikopi.uiHandler;
 
-import com.demikopi.model.InfoKedai;
+import com.demikopi.model.Admin;
 import com.demikopi.sistemAdmin.AdminController;
+import com.demikopi.sistemAdmin.AdminSession;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputControl;
+import javafx.scene.control.PasswordField;
 
 public class AdminSettingsController extends AdminNavigationController {
 
     private final AdminController adminController = new AdminController();
 
-    private InfoKedai infoAktif;
+    @FXML
+    private Label namaAdminLabel;
 
     @FXML
-    private TextField namaKedaiInput;
+    private Label usernameAdminLabel;
 
     @FXML
-    private TextField jamOperasionalInput;
+    private Label statusAkunLabel;
 
     @FXML
-    private TextField kontakInput;
+    private PasswordField passwordLamaInput;
 
     @FXML
-    private TextArea lokasiInput;
+    private PasswordField passwordBaruInput;
 
     @FXML
-    private Label statusSimpanLabel;
-
-    @FXML
-    private Label databaseStatusLabel;
-
-    @FXML
-    private Label infoStatusLabel;
+    private PasswordField konfirmasiPasswordInput;
 
     @FXML
     private void initialize() {
-        namaKedaiInput.setText("DemiKopi");
-        namaKedaiInput.setEditable(false);
-
-        muatInfoKedai();
-        pasangListenerPerubahan();
+        muatAkunAdmin();
     }
 
     @FXML
-    private void handleSimpanPengaturan() {
-        if (infoAktif == null) {
-            showAlert(Alert.AlertType.WARNING, "Data belum siap", "Info kedai belum berhasil dimuat.");
+    private void handleMuatUlangAkun() {
+        muatAkunAdmin();
+    }
+
+    @FXML
+    private void handleGantiPassword() {
+        if (!AdminSession.isLoggedIn()) {
+            showAlert(Alert.AlertType.WARNING, "Belum login", "Silakan login sebagai admin terlebih dahulu.");
             return;
         }
 
-        String jamOperasional = ambilText(jamOperasionalInput);
-        String lokasi = ambilText(lokasiInput);
-        String kontak = ambilText(kontakInput);
+        String passwordLama = ambilPassword(passwordLamaInput);
+        String passwordBaru = ambilPassword(passwordBaruInput);
+        String konfirmasiPassword = ambilPassword(konfirmasiPasswordInput);
 
-        if (jamOperasional.isEmpty() || lokasi.isEmpty() || kontak.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Data belum lengkap", "Jam operasional, lokasi, dan kontak wajib diisi.");
+        if (passwordLama.isEmpty() || passwordBaru.isEmpty() || konfirmasiPassword.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Data belum lengkap", "Semua kolom password wajib diisi.");
             return;
         }
 
-        InfoKedai infoBaru = new InfoKedai(infoAktif.getIdInfo(), jamOperasional, lokasi, kontak);
+        if (passwordBaru.length() < 4) {
+            showAlert(Alert.AlertType.WARNING, "Password terlalu pendek", "Password baru minimal 4 karakter.");
+            return;
+        }
+
+        if (!passwordBaru.equals(konfirmasiPassword)) {
+            showAlert(Alert.AlertType.WARNING, "Konfirmasi tidak cocok", "Password baru dan konfirmasi harus sama.");
+            return;
+        }
+
+        if (passwordLama.equals(passwordBaru)) {
+            showAlert(Alert.AlertType.WARNING, "Password sama", "Password baru harus berbeda dari password lama.");
+            return;
+        }
+
         try {
-            if (adminController.updateInfoKedai(infoBaru)) {
-                infoAktif = infoBaru;
-                statusSimpanLabel.setText("Tersimpan");
-                infoStatusLabel.setText("Info diperbarui");
-                showAlert(Alert.AlertType.INFORMATION, "Berhasil", "Pengaturan info kedai berhasil disimpan.");
+            boolean berhasil = adminController.gantiPasswordAdmin(
+                    AdminSession.getUsername(),
+                    passwordLama,
+                    passwordBaru
+            );
+
+            if (berhasil) {
+                bersihkanFormPassword();
+                statusAkunLabel.setText("Password berhasil diganti");
+                showAlert(Alert.AlertType.INFORMATION, "Berhasil", "Password admin berhasil diperbarui.");
             } else {
-                showAlert(Alert.AlertType.WARNING, "Gagal", "Pengaturan tidak berubah atau data tidak ditemukan.");
+                showAlert(Alert.AlertType.WARNING, "Gagal", "Password lama tidak sesuai.");
             }
         } catch (IllegalStateException e) {
-            databaseStatusLabel.setText("Tidak terkoneksi");
             showAlert(Alert.AlertType.ERROR, "Database bermasalah", e.getMessage());
         }
     }
 
     @FXML
-    private void handleMuatUlangPengaturan() {
-        muatInfoKedai();
+    private void handleBersihkanPassword() {
+        bersihkanFormPassword();
     }
 
-    private void muatInfoKedai() {
+    private void muatAkunAdmin() {
+        if (!AdminSession.isLoggedIn()) {
+            namaAdminLabel.setText("Belum login");
+            usernameAdminLabel.setText("-");
+            statusAkunLabel.setText("Tidak ada sesi admin aktif");
+            bersihkanFormPassword();
+            return;
+        }
+
+        usernameAdminLabel.setText(AdminSession.getUsername());
+        namaAdminLabel.setText(isiAtau(AdminSession.getNamaLengkap(), "Admin"));
+        statusAkunLabel.setText("Admin sedang login");
+
         try {
-            infoAktif = adminController.getInfoKedai();
-            databaseStatusLabel.setText("Terkoneksi");
-
-            if (infoAktif == null) {
-                kosongkanForm();
-                statusSimpanLabel.setText("Info kedai belum ada");
-                infoStatusLabel.setText("Belum tersedia");
-                showAlert(Alert.AlertType.WARNING, "Data kosong", "Info kedai belum tersedia di database.");
-                return;
+            Admin admin = adminController.getAdmin(AdminSession.getUsername());
+            if (admin != null) {
+                namaAdminLabel.setText(isiAtau(admin.getNamaLengkap(), "Admin"));
+                usernameAdminLabel.setText(admin.getUsername());
+                statusAkunLabel.setText("Data akun berhasil dimuat");
             }
-
-            jamOperasionalInput.setText(isiAman(infoAktif.getJamOperasional()));
-            lokasiInput.setText(isiAman(infoAktif.getLokasi()));
-            kontakInput.setText(isiAman(infoAktif.getKontak()));
-            statusSimpanLabel.setText("Data terbaru dimuat");
-            infoStatusLabel.setText("Info tersedia");
         } catch (IllegalStateException e) {
-            infoAktif = null;
-            kosongkanForm();
-            databaseStatusLabel.setText("Tidak terkoneksi");
-            infoStatusLabel.setText("-");
-            statusSimpanLabel.setText("Gagal memuat data");
-            showAlert(Alert.AlertType.ERROR, "Database bermasalah", e.getMessage());
+            statusAkunLabel.setText("Data akun dari sesi, database belum bisa dimuat");
         }
     }
 
-    private void pasangListenerPerubahan() {
-        jamOperasionalInput.textProperty().addListener((observable, oldValue, newValue) -> tandaiBelumDisimpan());
-        lokasiInput.textProperty().addListener((observable, oldValue, newValue) -> tandaiBelumDisimpan());
-        kontakInput.textProperty().addListener((observable, oldValue, newValue) -> tandaiBelumDisimpan());
+    private void bersihkanFormPassword() {
+        passwordLamaInput.clear();
+        passwordBaruInput.clear();
+        konfirmasiPasswordInput.clear();
     }
 
-    private void tandaiBelumDisimpan() {
-        if (infoAktif != null) {
-            statusSimpanLabel.setText("Perubahan belum disimpan");
-        }
-    }
-
-    private void kosongkanForm() {
-        jamOperasionalInput.clear();
-        lokasiInput.clear();
-        kontakInput.clear();
-    }
-
-    private String ambilText(TextInputControl field) {
+    private String ambilPassword(PasswordField field) {
         return field.getText() == null ? "" : field.getText().trim();
     }
 
-    private String isiAman(String value) {
-        return value == null ? "" : value;
+    private String isiAtau(String value, String fallback) {
+        return value == null || value.isBlank() ? fallback : value;
     }
 }

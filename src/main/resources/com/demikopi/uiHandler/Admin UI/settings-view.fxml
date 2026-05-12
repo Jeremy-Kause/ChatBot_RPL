@@ -37,6 +37,7 @@
                 <Button maxWidth="Infinity" onAction="#showDashboard" styleClass="nav-item" text="Dashboard" />
                 <Button maxWidth="Infinity" onAction="#showMenu" styleClass="nav-item" text="Manajemen Menu" />
                 <Button maxWidth="Infinity" onAction="#showFasilitas" styleClass="nav-item" text="Manajemen Fasilitas" />
+                <Button maxWidth="Infinity" onAction="#showLokasi" styleClass="nav-item" text="Lokasi Kedai" />
             </VBox>
 
             <Region prefHeight="12.0" />
@@ -48,6 +49,7 @@
 
             <Region VBox.vgrow="ALWAYS" />
 
+            <Button maxWidth="Infinity" onAction="#showChatbot" styleClass="nav-item" text="Kembali ke Chatbot" />
             <Button maxWidth="Infinity" onAction="#handleLogout" styleClass="nav-item nav-logout" text="Keluar" />
         </VBox>
     </left>
@@ -60,63 +62,90 @@
 
             <HBox alignment="CENTER_LEFT" spacing="8.0">
                 <VBox spacing="3.0">
-                    <Label styleClass="page-title" text="Pengaturan" />
-                    <Label styleClass="page-subtitle" text="Atur informasi kedai yang dipakai jawaban chatbot" />
+                    <Label styleClass="page-title" text="Pengaturan Akun" />
+                    <Label styleClass="page-subtitle" text="Lihat admin yang sedang login dan ubah password" />
                 </VBox>
                 <Region HBox.hgrow="ALWAYS" />
-                <Button onAction="#handleMuatUlangPengaturan" styleClass="soft-button" text="Muat Ulang" />
+                <Button onAction="#handleMuatUlangAkun" styleClass="soft-button" text="Muat Ulang" />
             </HBox>
 
             <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="content-scroll" VBox.vgrow="ALWAYS">
                 <content>
                     <VBox spacing="12.0" styleClass="page-shell">
-                        <HBox spacing="12.0">
-                            <VBox minWidth="0.0" spacing="12.0" styleClass="table-section" HBox.hgrow="ALWAYS">
+                        <HBox alignment="TOP_LEFT" spacing="16.0">
+                            <VBox minWidth="0.0" spacing="16.0" styleClass="settings-main-card" HBox.hgrow="ALWAYS">
                                 <VBox spacing="4.0">
-                                    <Label styleClass="section-title" text="Informasi Kedai" />
-                                    <Label styleClass="card-subtitle" text="Data ini digunakan untuk jawaban jam buka, lokasi, dan kontak" />
+                                    <Label styleClass="section-title" text="Akun Admin" />
+                                    <Label styleClass="card-subtitle" text="Data ini berasal dari admin yang berhasil login" />
                                 </VBox>
 
-                                <GridPane hgap="12.0" vgap="10.0">
+                                <GridPane hgap="18.0" vgap="14.0" styleClass="settings-form-grid">
                                     <columnConstraints>
-                                        <ColumnConstraints percentWidth="28.0" />
+                                        <ColumnConstraints minWidth="132.0" prefWidth="140.0" />
                                         <ColumnConstraints hgrow="ALWAYS" />
                                     </columnConstraints>
 
-                                    <Label styleClass="form-label" text="Nama Kedai" GridPane.rowIndex="0" />
-                                    <TextField fx:id="namaKedaiInput" editable="false" styleClass="settings-field" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                    <Label styleClass="settings-field-label" text="Nama Admin" GridPane.rowIndex="0" />
+                                    <Label fx:id="namaAdminLabel" maxWidth="Infinity" styleClass="account-value-label" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-                                    <Label styleClass="form-label" text="Jam Operasional" GridPane.rowIndex="1" />
-                                    <TextField fx:id="jamOperasionalInput" promptText="Contoh: Senin - Jumat: 08.00 - 22.00" styleClass="settings-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-
-                                    <Label styleClass="form-label" text="Kontak" GridPane.rowIndex="2" />
-                                    <TextField fx:id="kontakInput" promptText="Contoh: 0812-3456-7890" styleClass="settings-field" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-
-                                    <Label styleClass="form-label" text="Lokasi" GridPane.rowIndex="3" />
-                                    <TextArea fx:id="lokasiInput" prefRowCount="4" promptText="Alamat lengkap kedai" styleClass="settings-field" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                    <Label styleClass="settings-field-label" text="Username" GridPane.rowIndex="1" />
+                                    <Label fx:id="usernameAdminLabel" maxWidth="Infinity" styleClass="account-value-label" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                 </GridPane>
 
-                                <Separator />
+                                <Separator styleClass="settings-divider" />
 
-                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
-                                    <Label fx:id="statusSimpanLabel" styleClass="card-subtitle" text="Memuat data..." />
-                                    <Button onAction="#handleSimpanPengaturan" styleClass="button-primary" text="Simpan Pengaturan" />
+                                <VBox spacing="10.0">
+                                    <VBox spacing="4.0">
+                                        <Label styleClass="section-title" text="Ganti Password" />
+                                        <Label styleClass="card-subtitle" text="Masukkan password lama, lalu buat password baru" />
+                                    </VBox>
+
+                                    <GridPane hgap="18.0" vgap="14.0" styleClass="settings-form-grid">
+                                        <columnConstraints>
+                                            <ColumnConstraints minWidth="132.0" prefWidth="140.0" />
+                                            <ColumnConstraints hgrow="ALWAYS" />
+                                        </columnConstraints>
+
+                                        <Label styleClass="settings-field-label" text="Password Lama" GridPane.rowIndex="0" />
+                                        <PasswordField fx:id="passwordLamaInput" maxWidth="Infinity" promptText="Masukkan password lama" styleClass="settings-field" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                                        <Label styleClass="settings-field-label" text="Password Baru" GridPane.rowIndex="1" />
+                                        <PasswordField fx:id="passwordBaruInput" maxWidth="Infinity" promptText="Minimal 4 karakter" styleClass="settings-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                                        <Label styleClass="settings-field-label" text="Konfirmasi" GridPane.rowIndex="2" />
+                                        <PasswordField fx:id="konfirmasiPasswordInput" maxWidth="Infinity" promptText="Ulangi password baru" styleClass="settings-field" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    </GridPane>
+                                </VBox>
+
+                                <Separator styleClass="settings-divider" />
+
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <Label fx:id="statusAkunLabel" styleClass="settings-save-status" text="Memuat akun..." />
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Button onAction="#handleBersihkanPassword" styleClass="soft-button" text="Bersihkan" />
+                                    <Button onAction="#handleGantiPassword" styleClass="settings-primary-button" text="Simpan Password" />
                                 </HBox>
                             </VBox>
 
-                            <VBox minWidth="230.0" prefWidth="250.0" spacing="10.0" styleClass="side-panel">
-                                <Label styleClass="section-title" text="Status Sistem" />
-
-                                <VBox spacing="8.0" styleClass="mini-card accent-card">
-                                    <Label styleClass="mini-card-title light-text" text="Database" />
-                                    <Label fx:id="databaseStatusLabel" styleClass="mini-card-value light-text" text="-" />
-                                    <Label styleClass="card-subtitle light-subtext" text="Koneksi data admin" />
+                            <VBox minWidth="250.0" prefWidth="260.0" spacing="10.0" styleClass="settings-side-panel">
+                                <VBox spacing="4.0">
+                                    <Label styleClass="section-title" text="Catatan" />
+                                    <Label styleClass="card-subtitle" text="Panduan sederhana untuk admin" />
                                 </VBox>
 
-                                <VBox spacing="8.0" styleClass="mini-card">
-                                    <Label styleClass="mini-card-title" text="Info Kedai" />
-                                    <Label fx:id="infoStatusLabel" styleClass="mini-card-value" text="-" />
-                                    <Label styleClass="card-subtitle" text="Sumber jawaban chatbot" />
+                                <VBox spacing="12.0" styleClass="settings-summary-panel">
+                                    <VBox spacing="4.0">
+                                        <Label styleClass="settings-status-title" text="Sesi Aktif" />
+                                        <Label styleClass="settings-status-value" text="Admin Login" wrapText="true" />
+                                        <Label styleClass="settings-status-subtitle" text="Halaman ini membaca username dari sesi login admin" wrapText="true" />
+                                    </VBox>
+
+                                    <Separator styleClass="settings-divider" />
+
+                                    <VBox spacing="8.0">
+                                        <Label styleClass="settings-check-label" text="Gunakan password yang mudah diingat oleh admin terkait." wrapText="true" />
+                                        <Label styleClass="settings-check-label" text="Setelah password diganti, login berikutnya harus memakai password baru." wrapText="true" />
+                                    </VBox>
                                 </VBox>
                             </VBox>
                         </HBox>

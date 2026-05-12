@@ -12,6 +12,7 @@ public class ChatResponse {
         NUMBERED_DETAIL_ITEM,
         LIST_ITEM,
         DETAIL_ROW,
+        SCHEDULE_ROW,
         NOTE
     }
 
@@ -52,6 +53,10 @@ public class ChatResponse {
 
         public static ChatBlock detailRow(String label, String value) {
             return new ChatBlock(BlockType.DETAIL_ROW, label, value);
+        }
+
+        public static ChatBlock scheduleRow(String day, String time) {
+            return new ChatBlock(BlockType.SCHEDULE_ROW, day, time);
         }
 
         public static ChatBlock note(String text) {

@@ -37,6 +37,7 @@
                 <Button maxWidth="Infinity" onAction="#showDashboard" styleClass="nav-item" text="Dashboard" />
                 <Button maxWidth="Infinity" onAction="#showMenu" styleClass="nav-item" text="Manajemen Menu" />
                 <Button maxWidth="Infinity" onAction="#showFasilitas" styleClass="nav-item nav-active" text="Manajemen Fasilitas" />
+                <Button maxWidth="Infinity" onAction="#showLokasi" styleClass="nav-item" text="Lokasi Kedai" />
             </VBox>
 
             <Region prefHeight="12.0" />
@@ -48,6 +49,7 @@
 
             <Region VBox.vgrow="ALWAYS" />
 
+            <Button maxWidth="Infinity" onAction="#showChatbot" styleClass="nav-item" text="Kembali ke Chatbot" />
             <Button maxWidth="Infinity" onAction="#handleLogout" styleClass="nav-item nav-logout" text="Keluar" />
         </VBox>
     </left>

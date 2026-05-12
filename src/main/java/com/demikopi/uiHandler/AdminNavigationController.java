@@ -1,5 +1,6 @@
 package com.demikopi.uiHandler;
 
+import com.demikopi.sistemAdmin.AdminSession;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,7 +23,9 @@ public class AdminNavigationController {
     private static final String PAGE_DASHBOARD = "admin-dashboard.fxml";
     private static final String PAGE_MENU = "menu-management.fxml";
     private static final String PAGE_FASILITAS = "facility-management.fxml";
+    private static final String PAGE_LOKASI = "admin-lokasi.fxml";
     private static final String PAGE_SETTINGS = "settings-view.fxml";
+    private static final String PAGE_USER_DASHBOARD = "/com/demikopi/uiHandler/USER UI/dashboard.fxml";
     private static final double DEFAULT_WIDTH = 1000;
     private static final double DEFAULT_HEIGHT = 650;
     private static final double LOGIN_WIDTH = 900;
@@ -47,13 +50,24 @@ public class AdminNavigationController {
     }
 
     @FXML
+    public void showLokasi(ActionEvent event) {
+        openPage(PAGE_LOKASI);
+    }
+
+    @FXML
     public void showSettings(ActionEvent event) {
         openPage(PAGE_SETTINGS);
     }
 
     @FXML
     public void handleLogout(ActionEvent event) {
+        AdminSession.clear();
         openLoginPage();
+    }
+
+    @FXML
+    public void showChatbot(ActionEvent event) {
+        openUserDashboard();
     }
 
     protected void showAlert(Alert.AlertType type, String title, String message) {
@@ -97,6 +111,26 @@ public class AdminNavigationController {
             stage.centerOnScreen();
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Error", "Gagal logout dan membuka halaman login.");
+        }
+    }
+
+    private void openUserDashboard() {
+        if (rootPane == null || rootPane.getScene() == null) {
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(PAGE_USER_DASHBOARD));
+            Parent root = loader.load();
+            Stage stage = (Stage) rootPane.getScene().getWindow();
+            Scene currentScene = stage.getScene();
+            double width = currentScene != null ? currentScene.getWidth() : 900;
+            double height = currentScene != null ? currentScene.getHeight() : 640;
+            stage.setTitle("DemiKopi Coffee Assistant");
+            stage.setScene(new Scene(root, width, height));
+            stage.centerOnScreen();
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Gagal membuka halaman chatbot.");
         }
     }
 }

@@ -3,10 +3,14 @@ package com.demikopi.uiHandler;
 import com.demikopi.sistemUser.ChatEngine;
 import com.demikopi.sistemUser.ChatResponse;
 import com.demikopi.sistemUser.ChatResponse.ChatBlock;
+import com.demikopi.sistemAdmin.AdminSession;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
@@ -21,7 +25,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
+import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -32,6 +39,8 @@ public class UserDashboardController {
     private static final String PESAN_PEMBUKA =
             "Halo! Saya bot DemiKopi. Mau cari kopi yang manis, strong, atau mau lihat menu hari ini?";
     private static final String LOGO_PATH = "/com/demikopi/uiHandler/asset/coffee-cup.png";
+    private static final String ADMIN_LOGIN_PATH = "/com/demikopi/uiHandler/Admin UI/login.fxml";
+    private static final String ADMIN_DASHBOARD_PATH = "/com/demikopi/uiHandler/Admin UI/admin-dashboard.fxml";
 
     @FXML
     private ScrollPane chatScroll;
@@ -48,6 +57,9 @@ public class UserDashboardController {
     @FXML
     private Button tombolKirim;
 
+    @FXML
+    private Button adminLoginButton;
+
     private final ChatEngine chatEngine = new ChatEngine();
 
     @FXML
@@ -58,6 +70,7 @@ public class UserDashboardController {
                 tombolKirim.setDisable(newValue == null || newValue.trim().isEmpty()));
 
         tambahBubbleBot(PESAN_PEMBUKA);
+        perbaruiTombolAdmin();
         Platform.runLater(inputPesan::requestFocus);
     }
 
@@ -71,6 +84,42 @@ public class UserDashboardController {
         chatStream.getChildren().clear();
         tambahBubbleBot(PESAN_PEMBUKA);
         inputPesan.clear();
+    }
+
+    @FXML
+    private void handleLoginAdmin() {
+        if (AdminSession.isLoggedIn()) {
+            bukaHalamanAdmin(ADMIN_DASHBOARD_PATH, "DemiKopi Admin Dashboard", 1000, 650);
+        } else {
+            bukaHalamanAdmin(ADMIN_LOGIN_PATH, "DemiKopi Admin", 900, 600);
+        }
+    }
+
+    private void perbaruiTombolAdmin() {
+        if (adminLoginButton == null) {
+            return;
+        }
+
+        adminLoginButton.setText(AdminSession.isLoggedIn() ? "Admin Dashboard" : "Login Admin");
+    }
+
+    private void bukaHalamanAdmin(String fxmlPath, String title, double width, double height) {
+        URL pageUrl = getClass().getResource(fxmlPath);
+        if (pageUrl == null) {
+            tambahBubbleBot("Halaman admin belum ditemukan.");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(pageUrl);
+            Parent root = loader.load();
+            Stage stage = (Stage) chatScroll.getScene().getWindow();
+            stage.setTitle(title);
+            stage.setScene(new Scene(root, width, height));
+            stage.centerOnScreen();
+        } catch (IOException e) {
+            tambahBubbleBot("Maaf, halaman admin tidak bisa dibuka.");
+        }
     }
 
     @FXML
@@ -213,13 +262,15 @@ public class UserDashboardController {
             case TITLE:
                 return buatLabelTeksBot(block.getTitle(), "chat-block-title");
             case SECTION:
-                return buatLabelTeksBot(block.getTitle(), "chat-block-section");
+                return buatLabelSection(block.getTitle());
             case PARAGRAPH:
                 return buatLabelTeksBot(block.getTitle(), "chat-block-paragraph");
             case NOTE:
                 return buatLabelTeksBot(block.getTitle(), "chat-block-note");
             case DETAIL_ROW:
                 return buatDetailRow(block);
+            case SCHEDULE_ROW:
+                return buatScheduleRow(block);
             case NUMBERED_ITEM:
                 return buatNumberedItem(block);
             case NUMBERED_DETAIL_ITEM:
@@ -229,6 +280,16 @@ public class UserDashboardController {
             default:
                 return null;
         }
+    }
+
+    private Label buatLabelSection(String pesan) {
+        Label label = new Label(pesan == null ? "" : pesan);
+        label.setWrapText(true);
+        label.setTextOverrun(OverrunStyle.CLIP);
+        label.setMinHeight(Region.USE_PREF_SIZE);
+        label.setMaxWidth(Double.MAX_VALUE);
+        label.getStyleClass().add("chat-block-section");
+        return label;
     }
 
     private Node buatDetailRow(ChatBlock block) {
@@ -243,6 +304,27 @@ public class UserDashboardController {
         HBox row = new HBox(10, label, value);
         row.setAlignment(Pos.TOP_LEFT);
         row.getStyleClass().add("chat-detail-row");
+        return row;
+    }
+
+    private Node buatScheduleRow(ChatBlock block) {
+        Label day = new Label(block.getTitle());
+        day.setWrapText(true);
+        day.setMinWidth(118);
+        day.setMaxWidth(170);
+        day.setMinHeight(Region.USE_PREF_SIZE);
+        day.getStyleClass().add("chat-schedule-day");
+
+        Label time = new Label(block.getValue());
+        time.setWrapText(true);
+        time.setMinHeight(Region.USE_PREF_SIZE);
+        time.getStyleClass().add("chat-schedule-time");
+        HBox.setHgrow(time, Priority.ALWAYS);
+
+        HBox row = new HBox(12, day, time);
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.setMaxWidth(Double.MAX_VALUE);
+        row.getStyleClass().add("chat-schedule-row");
         return row;
     }
 

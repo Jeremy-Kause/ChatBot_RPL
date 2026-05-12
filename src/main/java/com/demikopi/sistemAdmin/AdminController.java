@@ -1,9 +1,11 @@
 package com.demikopi.sistemAdmin;
 
+import com.demikopi.dataAccess.AdminDAO;
 import com.demikopi.dataAccess.FasilitasDAO;
 import com.demikopi.dataAccess.InfoDAO;
 import com.demikopi.dataAccess.KategoriDAO;
 import com.demikopi.dataAccess.MenuDAO;
+import com.demikopi.model.Admin;
 import com.demikopi.model.Fasilitas;
 import com.demikopi.model.InfoKedai;
 import com.demikopi.model.Kategori;
@@ -17,6 +19,7 @@ public class AdminController {
     private InfoDAO infoDAO = new InfoDAO();
     private FasilitasDAO fasilitasDAO = new FasilitasDAO();
     private KategoriDAO kategoriDAO = new KategoriDAO();
+    private AdminDAO adminDAO = new AdminDAO();
 
     private boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
@@ -127,5 +130,26 @@ public class AdminController {
 
     public List<Kategori> getAllKategori() {
         return kategoriDAO.getAllKategori();
+    }
+
+    public Admin getAdmin(String username) {
+        if (isBlank(username)) {
+            return null;
+        }
+
+        return adminDAO.getAdmin(username);
+    }
+
+    public boolean gantiPasswordAdmin(String username, String passwordLama, String passwordBaru) {
+        if (isBlank(username) || isBlank(passwordLama) || isBlank(passwordBaru)) {
+            return false;
+        }
+
+        Admin admin = adminDAO.getAdmin(username);
+        if (admin == null || !admin.getPassword().equals(passwordLama)) {
+            return false;
+        }
+
+        return adminDAO.updatePassword(username, passwordBaru);
     }
 }

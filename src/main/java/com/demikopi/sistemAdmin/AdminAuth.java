@@ -8,9 +8,18 @@ public class AdminAuth {
 
     public boolean login(String username, String password) {
         Admin admin = adminDAO.getAdmin(username);
-        if (admin == null)
+        if (admin == null) {
+            AdminSession.clear();
             return false;
-        return admin.getPassword().equals(password);
+        }
+
+        boolean passwordCocok = admin.getPassword().equals(password);
+        if (passwordCocok) {
+            AdminSession.setAdmin(admin);
+        } else {
+            AdminSession.clear();
+        }
+        return passwordCocok;
     }
 }
 // Done
