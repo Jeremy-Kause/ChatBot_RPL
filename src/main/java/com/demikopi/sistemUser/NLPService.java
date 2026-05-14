@@ -1,5 +1,7 @@
 package com.demikopi.sistemUser;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -44,11 +46,12 @@ public class NLPService {
     private static final String[] KAMUS_RASA = {
             "manis", "sweet", "gula", "pahit", "bold", "strong", "asam", "acid", "acidic",
             "gurih", "savory", "asin", "creamy", "cream", "milky", "susu", "fruity",
-            "buah", "segar", "fresh", "ringan"
+            "buah", "segar", "fresh", "ringan", "cokelat", "chocolate", "caramel", "karamel",
+            "nutty", "kacang", "lembut", "mild"
     };
     private static final String[] KAMUS_SUHU = {
             "panas", "hangat", "hot", "warm", "dingin", "iced", "ice", "es", "cold",
-            "sejuk", "gerah"
+            "sejuk", "gerah", "hujan", "mendung"
     };
     private static final String[] KAMUS_MENU = {
             "menu", "daftar", "ada apa aja", "list", "katalog", "pilihan menu", "menunya",
@@ -66,7 +69,11 @@ public class NLPService {
             {"gurih", "gurih", "savory", "asin"},
             {"creamy", "creamy", "cream", "milky", "susu"},
             {"fruity", "fruity", "buah"},
-            {"segar", "segar", "fresh", "ringan"}
+            {"segar", "segar", "fresh", "ringan"},
+            {"cokelat", "cokelat", "chocolate"},
+            {"caramel", "caramel", "karamel"},
+            {"nutty", "nutty", "kacang"},
+            {"lembut", "lembut", "mild"}
     };
     private static final String[][] ALIAS_SUHU = {
             {"panas", "panas", "hangat", "hot", "warm"},
@@ -93,11 +100,132 @@ public class NLPService {
         TIDAK_DIKENAL
     }
 
+    public static class RecommendationQuery {
+        private final String kategori;
+        private final List<String> rasa;
+        private final String suhuSajian;
+        private final String konteksCuaca;
+        private final boolean bestseller;
+        private final String sumberInput;
+
+        public RecommendationQuery(String kategori, List<String> rasa, String suhuSajian,
+                                   String konteksCuaca, boolean bestseller, String sumberInput) {
+            this.kategori = kosongJadiNull(kategori);
+            this.rasa = rasa == null ? List.of() : List.copyOf(rasa);
+            this.suhuSajian = kosongJadiNull(suhuSajian);
+            this.konteksCuaca = kosongJadiNull(konteksCuaca);
+            this.bestseller = bestseller;
+            this.sumberInput = sumberInput == null ? "" : sumberInput;
+        }
+
+        public static RecommendationQuery empty() {
+            return new RecommendationQuery(null, List.of(), null, null, false, "");
+        }
+
+        public static RecommendationQuery fromLegacy(String kategori, String kriteria) {
+            if (kriteria == null || kriteria.isBlank()) {
+                return new RecommendationQuery(kategori, List.of(), null, null, false, "");
+            }
+
+            String normalized = kriteria.toLowerCase().trim();
+            if (isBestsellerText(normalized)) {
+                return new RecommendationQuery(kategori, List.of(), null, null, true, "");
+            }
+
+            if (normalized.equals("iced")) {
+                return new RecommendationQuery(kategori, List.of(), "dingin", null, false, "");
+            }
+            if (normalized.equals("hot")) {
+                return new RecommendationQuery(kategori, List.of(), "panas", null, false, "");
+            }
+            if (normalized.equals("panas") || normalized.equals("dingin")) {
+                return new RecommendationQuery(kategori, List.of(), normalized, null, false, "");
+            }
+
+            return new RecommendationQuery(kategori, List.of(normalized), null, null, false, "");
+        }
+
+        public String getKategori() {
+            return kategori;
+        }
+
+        public List<String> getRasa() {
+            return rasa;
+        }
+
+        public String getSuhuSajian() {
+            return suhuSajian;
+        }
+
+        public String getKonteksCuaca() {
+            return konteksCuaca;
+        }
+
+        public boolean isBestseller() {
+            return bestseller;
+        }
+
+        public String getSumberInput() {
+            return sumberInput;
+        }
+
+        public boolean hasPreference() {
+            return kategori != null || !rasa.isEmpty() || suhuSajian != null || konteksCuaca != null || bestseller;
+        }
+
+        public String toLegacyKeyword() {
+            if (!hasPreference()) {
+                return null;
+            }
+
+            String kriteria = null;
+            if (bestseller) {
+                kriteria = "bestseller";
+            } else if (!rasa.isEmpty()) {
+                kriteria = rasa.get(0);
+            } else if (suhuSajian != null) {
+                kriteria = suhuSajian;
+            }
+
+            if (kategori == null && kriteria == null) {
+                return null;
+            }
+            return (kategori != null ? kategori : "") + "|" + (kriteria != null ? kriteria : "");
+        }
+
+        private static String kosongJadiNull(String value) {
+            return value == null || value.isBlank() ? null : value.toLowerCase().trim();
+        }
+
+        private static boolean isBestsellerText(String value) {
+            return value.equals("bestseller")
+                    || value.equals("best seller")
+                    || value.equals("best-seller")
+                    || value.equals("terlaris")
+                    || value.equals("paling laku")
+                    || value.equals("favorit")
+                    || value.equals("favoritnya")
+                    || value.equals("unggulan")
+                    || value.equals("andalan")
+                    || value.equals("populer")
+                    || value.equals("viral")
+                    || value.equals("hits")
+                    || value.equals("signature")
+                    || value.equals("best")
+                    || value.equals("top")
+                    || value.equals("paling enak")
+                    || value.equals("yang enak");
+        }
+    }
+
     private String preprocess() {
         if (inputUser == null) {
             return "";
         }
-        return inputUser.toLowerCase().trim().replaceAll("[?.!]", "");
+        return inputUser.toLowerCase()
+                .replaceAll("[^a-z0-9\\s-]", " ")
+                .replaceAll("\\s+", " ")
+                .trim();
     }
 
     public Intent detectIntent() {
@@ -135,48 +263,8 @@ public class NLPService {
 
         switch (intent) {
             case TANYA_REKOMENDASI:
-                String extractedKategori = null;
-
-                // Konteks kategori rekomendasi.
-                if (processedInput.contains("makanan")
-                        || processedInput.contains("cemilan")
-                        || processedInput.contains("snack")
-                        || processedInput.contains("ngemil")
-                        || processedInput.contains("makan")) {
-                    extractedKategori = "makanan";
-                } else if (processedInput.contains("non-kopi")
-                        || processedInput.contains("non kopi")
-                        || processedInput.contains("tanpa kopi")
-                        || processedInput.contains("selain kopi")) {
-                    extractedKategori = "non-kopi";
-                } else if (processedInput.contains("kopi") || processedInput.contains("coffee")) {
-                    extractedKategori = "kopi";
-                } else if (processedInput.contains("minuman")
-                        || processedInput.contains("minum")
-                        || processedInput.contains("drink")
-                        || processedInput.contains("beverage")) {
-                    extractedKategori = "minuman";
-                }
-
-                String extractedKriteria = null;
-                if (containsAny(KAMUS_BESTSELLER)) {
-                    extractedKriteria = "bestseller";
-                }
-
-                // Kriteria rasa.
-                if (extractedKriteria == null) {
-                    extractedKriteria = findCanonicalAlias(ALIAS_RASA);
-                }
-
-                // Kriteria suhu.
-                if (extractedKriteria == null) {
-                    extractedKriteria = extractSuhuContext();
-                }
-
-                if (extractedKategori == null && extractedKriteria == null) {
-                    return null;
-                }
-                return (extractedKategori != null ? extractedKategori : "") + "|" + (extractedKriteria != null ? extractedKriteria : "");
+                RecommendationQuery query = extractRecommendationQuery();
+                return query.toLegacyKeyword();
 
             case TANYA_KATEGORI:
                 if (processedInput.contains("non-kopi")
@@ -236,6 +324,52 @@ public class NLPService {
         return null;
     }
 
+    public RecommendationQuery extractRecommendationQuery() {
+        if (processedInput == null || processedInput.isEmpty()) {
+            return RecommendationQuery.empty();
+        }
+
+        String kategori = extractKategoriRekomendasi();
+        List<String> rasa = findCanonicalAliases(ALIAS_RASA);
+        String konteksCuaca = extractCuacaContext();
+        String suhuSajian = mapCuacaKeSuhuSajian(konteksCuaca);
+        if (suhuSajian == null) {
+            suhuSajian = findCanonicalAlias(ALIAS_SUHU);
+        }
+
+        boolean bestseller = containsAny(KAMUS_BESTSELLER);
+        return new RecommendationQuery(kategori, rasa, suhuSajian, konteksCuaca, bestseller, processedInput);
+    }
+
+    private String extractKategoriRekomendasi() {
+        if (processedInput.contains("makanan")
+                || processedInput.contains("cemilan")
+                || processedInput.contains("snack")
+                || processedInput.contains("ngemil")
+                || processedInput.contains("makan")) {
+            return "makanan";
+        }
+        if (processedInput.contains("non-kopi")
+                || processedInput.contains("non kopi")
+                || processedInput.contains("tanpa kopi")
+                || processedInput.contains("selain kopi")) {
+            return "non-kopi";
+        }
+        if (processedInput.contains("kopi") || processedInput.contains("coffee")) {
+            return "kopi";
+        }
+        if (processedInput.contains("minuman")
+                || processedInput.contains("minum")
+                || processedInput.contains("drink")
+                || processedInput.contains("beverage")) {
+            return "minuman";
+        }
+        if (processedInput.contains("mix")) {
+            return "mix";
+        }
+        return null;
+    }
+
     private boolean containsAny(String[] kamus) {
         for (String kata : kamus) {
             if (containsKeyword(kata)) {
@@ -266,15 +400,56 @@ public class NLPService {
         return null;
     }
 
+    private List<String> findCanonicalAliases(String[][] aliasGroups) {
+        List<String> hasil = new ArrayList<>();
+        for (String[] aliasGroup : aliasGroups) {
+            String canonical = aliasGroup[0];
+            for (int i = 1; i < aliasGroup.length; i++) {
+                if (containsKeyword(aliasGroup[i])) {
+                    if (!hasil.contains(canonical)) {
+                        hasil.add(canonical);
+                    }
+                    break;
+                }
+            }
+        }
+        return hasil;
+    }
+
     private boolean containsAnyAlias(String[][] aliasGroups) {
         return findCanonicalAlias(aliasGroups) != null;
     }
 
     private String extractSuhuContext() {
-        if (processedInput.matches(".*\\b(cuaca|hari|udara)\\b.*\\b(panas|gerah)\\b.*")) {
+        String suhuDariCuaca = mapCuacaKeSuhuSajian(extractCuacaContext());
+        return suhuDariCuaca == null ? findCanonicalAlias(ALIAS_SUHU) : suhuDariCuaca;
+    }
+
+    private String extractCuacaContext() {
+        boolean adaKonteksCuaca = processedInput.matches(".*\\b(cuaca|cuacanya|hari|udara|udaranya)\\b.*")
+                || containsKeyword("hujan")
+                || containsKeyword("mendung");
+        if (!adaKonteksCuaca) {
+            return null;
+        }
+
+        if (containsKeyword("panas") || containsKeyword("gerah") || containsKeyword("terik")) {
+            return "panas";
+        }
+        if (containsKeyword("dingin") || containsKeyword("sejuk") || containsKeyword("hujan") || containsKeyword("mendung")) {
             return "dingin";
         }
-        return findCanonicalAlias(ALIAS_SUHU);
+        return null;
+    }
+
+    private String mapCuacaKeSuhuSajian(String cuaca) {
+        if ("panas".equals(cuaca)) {
+            return "dingin";
+        }
+        if ("dingin".equals(cuaca)) {
+            return "panas";
+        }
+        return null;
     }
 
     private boolean containsKeyword(String keyword) {

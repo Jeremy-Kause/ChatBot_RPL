@@ -8,6 +8,7 @@ import com.demikopi.model.InfoKedai;
 import com.demikopi.model.Menu;
 import com.demikopi.sistemUser.ChatResponse.ChatBlock;
 import com.demikopi.sistemUser.NLPService.Intent;
+import com.demikopi.sistemUser.NLPService.RecommendationQuery;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -67,7 +68,7 @@ public class ChatEngine {
             case TANYA_KATEGORI:
                 return buildChatResponseMenuKategori(keyword);
             case TANYA_REKOMENDASI:
-                return buildChatResponseRekomendasi(keyword);
+                return buildChatResponseRekomendasi(nlp.extractRecommendationQuery());
             case TANYA_DETAIL_MENU:
                 return buildChatResponseDetailMenu(keyword);
             case TANYA_JAM_BUKA:
@@ -204,16 +205,17 @@ public class ChatEngine {
         return ChatResponse.withImage(responseText, imagePath, blocks);
     }
 
-    private ChatResponse buildChatResponseRekomendasi(String keyword) {
+    private ChatResponse buildChatResponseRekomendasi(RecommendationQuery query) {
         List<Menu> menus = ambilMenuTersedia();
+        RecommendationQuery safeQuery = query == null ? RecommendationQuery.empty() : query;
 
-        if (permintaanBestseller(keyword)) {
-            return buildChatResponseBestseller(keyword, menus);
+        if (permintaanBestseller(safeQuery)) {
+            return buildChatResponseBestseller(safeQuery, menus);
         }
 
-        String responseText = rekomendasi.getRekomendasi(keyword, menus, BATAS_REKOMENDASI);
-        List<Menu> menuRekomendasi = rekomendasi.getMenuRekomendasi(keyword, menus, BATAS_REKOMENDASI);
-        List<ChatBlock> blocks = buildBlocksRekomendasi(responseText, menuRekomendasi);
+        String responseText = rekomendasi.getRekomendasi(safeQuery, menus, BATAS_REKOMENDASI);
+        List<Menu> menuRekomendasi = rekomendasi.getMenuRekomendasi(safeQuery, menus, BATAS_REKOMENDASI);
+        List<ChatBlock> blocks = buildBlocksRekomendasi(responseText, menuRekomendasi, safeQuery);
         List<ChatResponse.ChatImage> images = menuRekomendasi.stream()
                 .map(menu -> new ChatResponse.ChatImage(
                         menu.getNamaMenu(),
@@ -229,10 +231,11 @@ public class ChatEngine {
         return ChatResponse.withImages(responseText, images, blocks);
     }
 
-    private ChatResponse buildChatResponseBestseller(String keyword, List<Menu> menus) {
-        List<Menu> menuBestseller = rekomendasi.getMenuRekomendasi(keyword, menus, BATAS_BESTSELLER);
-        String responseText = "Top 10 best seller DEMIKOPI";
-        List<ChatBlock> blocks = List.of(ChatBlock.title(responseText));
+    private ChatResponse buildChatResponseBestseller(RecommendationQuery query, List<Menu> menus) {
+        RecommendationQuery safeQuery = query == null ? RecommendationQuery.empty() : query;
+        List<Menu> menuBestseller = rekomendasi.getMenuRekomendasi(safeQuery, menus, BATAS_BESTSELLER);
+        String responseText = rekomendasi.getRekomendasi(safeQuery, menus, BATAS_BESTSELLER);
+        List<ChatBlock> blocks = buildBlocksRekomendasi(responseText, menuBestseller, safeQuery);
         List<ChatResponse.ChatImage> images = menuBestseller.stream()
                 .map(menu -> new ChatResponse.ChatImage(
                         menu.getNamaMenu(),
@@ -275,7 +278,7 @@ public class ChatEngine {
         return blocks;
     }
 
-    private List<ChatBlock> buildBlocksRekomendasi(String responseText, List<Menu> menus) {
+    private List<ChatBlock> buildBlocksRekomendasi(String responseText, List<Menu> menus, RecommendationQuery query) {
         List<ChatBlock> blocks = new ArrayList<>();
         blocks.add(ChatBlock.title(ambilBarisPertama(responseText, "Rekomendasi menu untukmu")));
         if (menus == null || menus.isEmpty()) {
@@ -288,7 +291,8 @@ public class ChatEngine {
             if (menu.isBestseller()) {
                 subtitle += " - Best Seller";
             }
-            blocks.add(ChatBlock.numberedItem(nomor, menu.getNamaMenu(), subtitle));
+            String alasan = rekomendasi.getAlasanRekomendasi(query, menu);
+            blocks.add(ChatBlock.numberedDetailItem(nomor, menu.getNamaMenu(), subtitle + "\nAlasan: " + alasan));
             nomor++;
         }
         return blocks;
@@ -520,19 +524,15 @@ public class ChatEngine {
         return kategori.equals(dicari);
     }
 
-    private boolean permintaanBestseller(String keyword) {
-        if (keyword == null || keyword.isBlank()) {
+    private boolean permintaanBestseller(RecommendationQuery query) {
+        if (query == null || !query.hasPreference()) {
             return true;
         }
 
-        String keywordLower = keyword.toLowerCase(Locale.ROOT);
-        return keywordLower.contains("bestseller")
-                || keywordLower.contains("best seller")
-                || keywordLower.contains("best-seller")
-                || keywordLower.contains("terlaris")
-                || keywordLower.contains("paling laku")
-                || keywordLower.contains("favorit")
-                || keywordLower.contains("unggulan");
+        return query.isBestseller()
+                && query.getKategori() == null
+                && query.getRasa().isEmpty()
+                && query.getSuhuSajian() == null;
     }
 
     private String isiAtauStrip(String value) {
