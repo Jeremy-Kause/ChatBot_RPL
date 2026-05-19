@@ -36,8 +36,7 @@ import java.util.List;
 
 public class UserDashboardController {
 
-    private static final String PESAN_PEMBUKA =
-            "Halo! Saya bot DemiKopi. Mau cari kopi yang manis, strong, atau mau lihat menu hari ini?";
+    private static final String PESAN_PEMBUKA = "Halo! Saya bot DemiKopi. Mau cari kopi yang manis, strong, atau mau lihat menu hari ini?";
     private static final String LOGO_PATH = "/com/demikopi/uiHandler/asset/coffee-cup.png";
     private static final String ADMIN_LOGIN_PATH = "/com/demikopi/uiHandler/Admin UI/login.fxml";
     private static final String ADMIN_DASHBOARD_PATH = "/com/demikopi/uiHandler/Admin UI/admin-dashboard.fxml";
