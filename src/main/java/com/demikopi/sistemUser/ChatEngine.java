@@ -532,7 +532,9 @@ public class ChatEngine {
         return query.isBestseller()
                 && query.getKategori() == null
                 && query.getRasa().isEmpty()
-                && query.getSuhuSajian() == null;
+                && query.getSuhuSajian() == null
+                && query.getKonteksCuaca() == null
+                && query.getTujuanPengguna().isEmpty();
     }
 
     private String isiAtauStrip(String value) {

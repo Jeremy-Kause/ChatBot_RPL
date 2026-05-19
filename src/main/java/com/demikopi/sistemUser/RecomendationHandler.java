@@ -123,6 +123,12 @@ public class RecomendationHandler {
             }
         }
 
+        for (String tujuan : safeQuery.getTujuanPengguna()) {
+            if (matchTujuan(menu, tujuan)) {
+                alasan.add(formatAlasanTujuan(tujuan));
+            }
+        }
+
         if (safeQuery.isBestseller() && menu.isBestseller()) {
             alasan.add("termasuk menu best seller");
         } else if (!safeQuery.isBestseller() && menu.isBestseller()) {
@@ -196,6 +202,15 @@ public class RecomendationHandler {
             }
         }
 
+        if (!safeQuery.getTujuanPengguna().isEmpty()) {
+            List<Menu> tujuanCocok = candidates.stream()
+                    .filter(menu -> matchSalahSatuTujuan(menu, safeQuery.getTujuanPengguna()))
+                    .collect(Collectors.toList());
+            if (!tujuanCocok.isEmpty()) {
+                candidates = tujuanCocok;
+            }
+        }
+
         if (safeQuery.isBestseller()) {
             List<Menu> bestSeller = candidates.stream()
                     .filter(Menu::isBestseller)
@@ -247,6 +262,10 @@ public class RecomendationHandler {
 
         if (query.getKonteksCuaca() != null && query.getSuhuSajian() != null) {
             skor += matchSuhu(menu, query.getSuhuSajian()) ? 8 : 0;
+        }
+
+        for (String tujuan : query.getTujuanPengguna()) {
+            skor += hitungSkorTujuan(menu, tujuan);
         }
 
         if (query.isBestseller()) {
@@ -333,6 +352,103 @@ public class RecomendationHandler {
         return suhuMenu.contains(target);
     }
 
+    private boolean matchSalahSatuTujuan(Menu menu, List<String> tujuanPengguna) {
+        if (tujuanPengguna == null || tujuanPengguna.isEmpty()) {
+            return true;
+        }
+
+        for (String tujuan : tujuanPengguna) {
+            if (matchTujuan(menu, tujuan)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean matchTujuan(Menu menu, String tujuan) {
+        return hitungSkorTujuan(menu, tujuan) > 0;
+    }
+
+    private int hitungSkorTujuan(Menu menu, String tujuan) {
+        if (menu == null || tujuan == null || tujuan.isBlank()) {
+            return 0;
+        }
+
+        String normalizedTujuan = tujuan.toLowerCase(Locale.ROOT);
+        String teksMenu = teksMenu(menu);
+        int skor = 0;
+
+        if (normalizedTujuan.equals("belajar") || normalizedTujuan.equals("kerja")) {
+            if (kategoriBerbasisKopi(menu)) {
+                skor += 18;
+            }
+            if (mengandungSalahSatu(teksMenu, "latte", "cappuccino", "americano", "v60", "pour over",
+                    "cold brew", "kopi susu", "mocha", "hazelnut", "caramel", "espresso")) {
+                skor += 8;
+            }
+            if (menu.isBestseller()) {
+                skor += 4;
+            }
+            if (mengandungSalahSatu(teksMenu, "dessert", "ice cream", "affogato")) {
+                skor -= 6;
+            }
+            return skor > 0 ? skor : -8;
+        }
+
+        if (normalizedTujuan.equals("melek")) {
+            if (kategoriBerbasisKopi(menu)) {
+                skor += 14;
+            }
+            if (mengandungSalahSatu(teksMenu, "espresso", "americano", "v60", "pour over", "cold brew",
+                    "bold", "strong", "intense", "pahit")) {
+                skor += 16;
+            }
+            if (mengandungSalahSatu(teksMenu, "ringan", "mild", "dessert", "ice cream")) {
+                skor -= 5;
+            }
+            return skor > 0 ? skor : -10;
+        }
+
+        if (normalizedTujuan.equals("meeting")) {
+            if (kategoriMinuman(menu)) {
+                skor += 12;
+            }
+            if (mengandungSalahSatu(teksMenu, "latte", "cappuccino", "americano", "matcha", "mocha", "teh")) {
+                skor += 8;
+            }
+            if (menu.isBestseller()) {
+                skor += 4;
+            }
+            return skor > 0 ? skor : -6;
+        }
+
+        if (normalizedTujuan.equals("santai")) {
+            if (mengandungSalahSatu(teksMenu, "creamy", "manis", "lembut", "cokelat", "caramel",
+                    "dessert", "smooth", "flaky", "fudgy")) {
+                skor += 18;
+            }
+            if (menu.isBestseller()) {
+                skor += 4;
+            }
+            return skor > 0 ? skor : -4;
+        }
+
+        if (normalizedTujuan.equals("nongkrong")) {
+            if (menu.isBestseller()) {
+                skor += 12;
+            }
+            if (kategoriMakanan(menu)) {
+                skor += 8;
+            }
+            if (mengandungSalahSatu(teksMenu, "sharing", "snack", "crispy", "cheese", "manis", "creamy")) {
+                skor += 7;
+            }
+            return skor > 0 ? skor : -3;
+        }
+
+        return 0;
+    }
+
     private String buildJudulRekomendasi(RecommendationQuery query, int jumlah) {
         RecommendationQuery safeQuery = query == null ? RecommendationQuery.empty() : query;
         if (!safeQuery.hasPreference()) {
@@ -351,6 +467,13 @@ public class RecomendationHandler {
             kondisi.add("cocok untuk cuaca " + safeQuery.getKonteksCuaca());
         } else if (safeQuery.getSuhuSajian() != null) {
             kondisi.add("disajikan " + safeQuery.getSuhuSajian());
+        }
+        if (!safeQuery.getTujuanPengguna().isEmpty()) {
+            kondisi.add("cocok untuk " + gabungDenganDan(
+                    safeQuery.getTujuanPengguna().stream()
+                            .map(this::formatTujuan)
+                            .collect(Collectors.toList())
+            ));
         }
         if (safeQuery.isBestseller()) {
             kondisi.add("best seller");
@@ -377,6 +500,89 @@ public class RecomendationHandler {
             return "termasuk menu makanan";
         }
         return "sesuai kategori " + kategori;
+    }
+
+    private String formatAlasanTujuan(String tujuan) {
+        if ("belajar".equals(tujuan)) {
+            return "cocok untuk belajar atau mengerjakan tugas karena tetap memberi dorongan kopi";
+        }
+        if ("kerja".equals(tujuan)) {
+            return "cocok untuk kerja atau fokus lama";
+        }
+        if ("melek".equals(tujuan)) {
+            return "cocok saat butuh minuman yang lebih membantu tetap melek";
+        }
+        if ("meeting".equals(tujuan)) {
+            return "cocok untuk meeting atau diskusi karena mudah dinikmati sambil ngobrol";
+        }
+        if ("santai".equals(tujuan)) {
+            return "cocok untuk santai karena profil rasanya nyaman diminum pelan-pelan";
+        }
+        if ("nongkrong".equals(tujuan)) {
+            return "cocok untuk nongkrong bersama teman";
+        }
+        return "sesuai tujuan " + tujuan;
+    }
+
+    private String formatTujuan(String tujuan) {
+        if ("belajar".equals(tujuan)) {
+            return "belajar/mengerjakan tugas";
+        }
+        if ("kerja".equals(tujuan)) {
+            return "kerja atau fokus";
+        }
+        if ("melek".equals(tujuan)) {
+            return "tetap melek";
+        }
+        if ("meeting".equals(tujuan)) {
+            return "meeting/diskusi";
+        }
+        if ("santai".equals(tujuan)) {
+            return "santai";
+        }
+        if ("nongkrong".equals(tujuan)) {
+            return "nongkrong";
+        }
+        return tujuan;
+    }
+
+    private boolean kategoriBerbasisKopi(Menu menu) {
+        String kategori = menu == null || menu.getKategori() == null ? "" : menu.getKategori().toLowerCase(Locale.ROOT);
+        return kategori.equals("kopi") || kategori.equals("mix");
+    }
+
+    private boolean kategoriMinuman(Menu menu) {
+        String kategori = menu == null || menu.getKategori() == null ? "" : menu.getKategori().toLowerCase(Locale.ROOT);
+        return kategori.equals("kopi") || kategori.equals("non-kopi") || kategori.equals("mix");
+    }
+
+    private boolean kategoriMakanan(Menu menu) {
+        String kategori = menu == null || menu.getKategori() == null ? "" : menu.getKategori().toLowerCase(Locale.ROOT);
+        return kategori.equals("makanan");
+    }
+
+    private String teksMenu(Menu menu) {
+        if (menu == null) {
+            return "";
+        }
+        return (menu.getNamaMenu() + " "
+                + menu.getKategori() + " "
+                + menu.getProfilRasa() + " "
+                + menu.getSuhuSajian() + " "
+                + menu.getDeskripsiMenu()).toLowerCase(Locale.ROOT);
+    }
+
+    private boolean mengandungSalahSatu(String text, String... keywords) {
+        if (text == null || keywords == null) {
+            return false;
+        }
+
+        for (String keyword : keywords) {
+            if (keyword != null && !keyword.isBlank() && text.contains(keyword.toLowerCase(Locale.ROOT))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String gabungDenganDan(List<String> items) {

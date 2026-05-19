@@ -79,6 +79,14 @@ public class NLPService {
             {"panas", "panas", "hangat", "hot", "warm"},
             {"dingin", "dingin", "iced", "ice", "es", "cold", "sejuk", "gerah"}
     };
+    private static final String[][] ALIAS_TUJUAN = {
+            {"belajar", "belajar", "mengerjakan tugas", "ngerjain tugas", "kerjain tugas", "nugas", "tugas", "study", "skripsi", "kuliah", "pr"},
+            {"kerja", "kerja", "bekerja", "work", "wfa", "deadline", "produktif", "fokus", "laptop", "coding", "kerjaan"},
+            {"melek", "melek", "begadang", "ngantuk", "anti ngantuk", "butuh energi", "energi", "semangat"},
+            {"meeting", "meeting", "rapat", "diskusi", "presentasi", "ketemu klien"},
+            {"santai", "santai", "relax", "chill", "me time", "membaca", "baca buku"},
+            {"nongkrong", "nongkrong", "hangout", "teman", "bareng teman", "kumpul", "rame-rame"}
+    };
 
     private String inputUser;
     private String processedInput;
@@ -105,44 +113,47 @@ public class NLPService {
         private final List<String> rasa;
         private final String suhuSajian;
         private final String konteksCuaca;
+        private final List<String> tujuanPengguna;
         private final boolean bestseller;
         private final String sumberInput;
 
         public RecommendationQuery(String kategori, List<String> rasa, String suhuSajian,
-                                   String konteksCuaca, boolean bestseller, String sumberInput) {
+                                   String konteksCuaca, List<String> tujuanPengguna,
+                                   boolean bestseller, String sumberInput) {
             this.kategori = kosongJadiNull(kategori);
             this.rasa = rasa == null ? List.of() : List.copyOf(rasa);
             this.suhuSajian = kosongJadiNull(suhuSajian);
             this.konteksCuaca = kosongJadiNull(konteksCuaca);
+            this.tujuanPengguna = tujuanPengguna == null ? List.of() : List.copyOf(tujuanPengguna);
             this.bestseller = bestseller;
             this.sumberInput = sumberInput == null ? "" : sumberInput;
         }
 
         public static RecommendationQuery empty() {
-            return new RecommendationQuery(null, List.of(), null, null, false, "");
+            return new RecommendationQuery(null, List.of(), null, null, List.of(), false, "");
         }
 
         public static RecommendationQuery fromLegacy(String kategori, String kriteria) {
             if (kriteria == null || kriteria.isBlank()) {
-                return new RecommendationQuery(kategori, List.of(), null, null, false, "");
+                return new RecommendationQuery(kategori, List.of(), null, null, List.of(), false, "");
             }
 
             String normalized = kriteria.toLowerCase().trim();
             if (isBestsellerText(normalized)) {
-                return new RecommendationQuery(kategori, List.of(), null, null, true, "");
+                return new RecommendationQuery(kategori, List.of(), null, null, List.of(), true, "");
             }
 
             if (normalized.equals("iced")) {
-                return new RecommendationQuery(kategori, List.of(), "dingin", null, false, "");
+                return new RecommendationQuery(kategori, List.of(), "dingin", null, List.of(), false, "");
             }
             if (normalized.equals("hot")) {
-                return new RecommendationQuery(kategori, List.of(), "panas", null, false, "");
+                return new RecommendationQuery(kategori, List.of(), "panas", null, List.of(), false, "");
             }
             if (normalized.equals("panas") || normalized.equals("dingin")) {
-                return new RecommendationQuery(kategori, List.of(), normalized, null, false, "");
+                return new RecommendationQuery(kategori, List.of(), normalized, null, List.of(), false, "");
             }
 
-            return new RecommendationQuery(kategori, List.of(normalized), null, null, false, "");
+            return new RecommendationQuery(kategori, List.of(normalized), null, null, List.of(), false, "");
         }
 
         public String getKategori() {
@@ -161,6 +172,10 @@ public class NLPService {
             return konteksCuaca;
         }
 
+        public List<String> getTujuanPengguna() {
+            return tujuanPengguna;
+        }
+
         public boolean isBestseller() {
             return bestseller;
         }
@@ -170,7 +185,8 @@ public class NLPService {
         }
 
         public boolean hasPreference() {
-            return kategori != null || !rasa.isEmpty() || suhuSajian != null || konteksCuaca != null || bestseller;
+            return kategori != null || !rasa.isEmpty() || suhuSajian != null || konteksCuaca != null
+                    || !tujuanPengguna.isEmpty() || bestseller;
         }
 
         public String toLegacyKeyword() {
@@ -225,7 +241,10 @@ public class NLPService {
         return inputUser.toLowerCase()
                 .replaceAll("[^a-z0-9\\s-]", " ")
                 .replaceAll("\\s+", " ")
-                .trim();
+                .trim()
+                .replaceAll("\\bcock\\b", "cocok")
+                .replaceAll("\\byang\\s+main\\b", "yang manis")
+                .replaceAll("\\bmain\\s+(dan|serta|tapi|untuk|yang|cocok)\\b", "manis $1");
     }
 
     public Intent detectIntent() {
@@ -243,6 +262,7 @@ public class NLPService {
         } else if (containsAny(KAMUS_REKOMENDASI)
                 || containsAnyAlias(ALIAS_RASA)
                 || containsAnyAlias(ALIAS_SUHU)
+                || containsAnyAlias(ALIAS_TUJUAN)
                 || processedInput.matches(".*\\b(pengen|pengin|mau|ingin|pesen|pesan|beli|cari|nyari)\\b.*\\byang\\b.*")) {
             return Intent.TANYA_REKOMENDASI;
         } else if (containsAny(KAMUS_DETAIL)) {
@@ -331,6 +351,7 @@ public class NLPService {
 
         String kategori = extractKategoriRekomendasi();
         List<String> rasa = findCanonicalAliases(ALIAS_RASA);
+        List<String> tujuanPengguna = findCanonicalAliases(ALIAS_TUJUAN);
         String konteksCuaca = extractCuacaContext();
         String suhuSajian = mapCuacaKeSuhuSajian(konteksCuaca);
         if (suhuSajian == null) {
@@ -338,7 +359,7 @@ public class NLPService {
         }
 
         boolean bestseller = containsAny(KAMUS_BESTSELLER);
-        return new RecommendationQuery(kategori, rasa, suhuSajian, konteksCuaca, bestseller, processedInput);
+        return new RecommendationQuery(kategori, rasa, suhuSajian, konteksCuaca, tujuanPengguna, bestseller, processedInput);
     }
 
     private String extractKategoriRekomendasi() {
